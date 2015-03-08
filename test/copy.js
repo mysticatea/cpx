@@ -1,0 +1,108 @@
+import {execSync} from "child_process";
+import {expect} from "chai";
+import * as cpx from "../lib/index";
+import {setupTestDir,
+        teardownTestDir,
+        content} from "./util/util";
+
+describe("The copy method", () => {
+
+  describe("should copy specified file blobs:", () => {
+    beforeEach(() => {
+      setupTestDir({
+        "test-ws/untachable.txt": "untachable",
+        "test-ws/a/hello.txt": "Hello",
+        "test-ws/a/b/this-is.txt": "A pen",
+        "test-ws/a/b/that-is.txt": "A note",
+        "test-ws/a/b/no-copy.dat": "no-copy"
+      });
+    });
+    afterEach(() => {
+      teardownTestDir("test-ws");
+    });
+
+    function verifyFiles() {
+      expect(content("test-ws/untachable.txt")).to.equal("untachable");
+      expect(content("test-ws/a/hello.txt")).to.equal("Hello");
+      expect(content("test-ws/a/b/this-is.txt")).to.equal("A pen");
+      expect(content("test-ws/a/b/that-is.txt")).to.equal("A note");
+      expect(content("test-ws/a/b/no-copy.dat")).to.equal("no-copy");
+      expect(content("test-ws/b/untachable.txt")).to.be.null;
+      expect(content("test-ws/b/hello.txt")).to.equal("Hello");
+      expect(content("test-ws/b/b/this-is.txt")).to.equal("A pen");
+      expect(content("test-ws/b/b/that-is.txt")).to.equal("A note");
+      expect(content("test-ws/b/b/no-copy.dat")).to.be.null;
+    }
+
+    it("lib async version.", done => {
+      cpx.copy("test-ws/a/**/*.txt", "test-ws/b", err => {
+        expect(err).to.be.null;
+        verifyFiles();
+        done();
+      });
+    });
+
+    it("lib sync version.", () => {
+      cpx.copySync("test-ws/a/**/*.txt", "test-ws/b");
+      verifyFiles();
+    });
+
+    it("command version.", () => {
+      execSync("node lib/command.js test-ws/a/**/*.txt test-ws/b");
+      verifyFiles();
+    });
+
+  });
+
+  describe("should clean and copy specified file blobs when give clean option:", () => {
+    beforeEach(() => {
+      setupTestDir({
+        "test-ws/untachable.txt": "untachable",
+        "test-ws/a/hello.txt": "Hello",
+        "test-ws/a/b/this-is.txt": "A pen",
+        "test-ws/a/b/that-is.txt": "A note",
+        "test-ws/a/b/no-copy.dat": "no-copy",
+        "test-ws/b/b/remove.txt": "remove",
+        "test-ws/b/b/no-remove.dat": "no-remove"
+      });
+    });
+    afterEach(() => {
+      teardownTestDir("test-ws");
+    });
+
+    function verifyFiles() {
+      expect(content("test-ws/untachable.txt")).to.equal("untachable");
+      expect(content("test-ws/a/hello.txt")).to.equal("Hello");
+      expect(content("test-ws/a/b/this-is.txt")).to.equal("A pen");
+      expect(content("test-ws/a/b/that-is.txt")).to.equal("A note");
+      expect(content("test-ws/a/b/no-copy.dat")).to.equal("no-copy");
+      expect(content("test-ws/b/untachable.txt")).to.be.null;
+      expect(content("test-ws/b/hello.txt")).to.equal("Hello");
+      expect(content("test-ws/b/b/this-is.txt")).to.equal("A pen");
+      expect(content("test-ws/b/b/that-is.txt")).to.equal("A note");
+      expect(content("test-ws/b/b/no-copy.dat")).to.be.null;
+      expect(content("test-ws/b/b/remove.txt")).to.be.null;
+      expect(content("test-ws/b/b/no-remove.dat")).to.equal("no-remove");
+    }
+
+    it("lib async version.", done => {
+      cpx.copy("test-ws/a/**/*.txt", "test-ws/b", {clean: true}, err => {
+        expect(err).to.be.null;
+        verifyFiles();
+        done();
+      });
+    });
+
+    it("lib sync version.", () => {
+      cpx.copySync("test-ws/a/**/*.txt", "test-ws/b", {clean: true});
+      verifyFiles();
+    });
+
+    it("command version.", () => {
+      execSync("node lib/command.js test-ws/a/**/*.txt test-ws/b --clean");
+      verifyFiles();
+    });
+
+  });
+
+});

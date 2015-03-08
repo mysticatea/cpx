@@ -1,0 +1,57 @@
+{
+  "name": "dir-sync",
+  "version": "1.0.0",
+  "description": "A cli tool to watch and copy directories.",
+  "main": "lib/index.js",
+  "bin": {
+    "cpx": "lib/command.js"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "babel src --out-dir lib",
+    "lint": "eslint src && eslint test",
+    "test": "mocha test/*.js --compilers js:babel/register",
+    "testing": "node tools/watch.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mysticatea/dir-sync.git"
+  },
+  "keywords": [
+    "sync",
+    "rsync",
+    "watch",
+    "observe",
+    "copy",
+    "transfer",
+    "dir",
+    "directory",
+    "directories",
+    "file",
+    "files"
+  ],
+  "author": "Toru Nagashima",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mysticatea/dir-sync/issues"
+  },
+  "homepage": "https://github.com/mysticatea/dir-sync",
+  "devDependencies": {
+    "babel": "^4.7.1",
+    "chai": "^2.1.1",
+    "eslint": "^0.16.0",
+    "mocha": "^2.2.0",
+    "rimraf": "^2.3.1"
+  },
+  "dependencies": {
+    "chokidar": "^1.0.0-rc4",
+    "commander": "^2.6.0",
+    "cp": "^0.2.0",
+    "glob": "^5.0.0",
+    "glob2base": "0.0.12",
+    "minimatch": "^2.0.1",
+    "mkdirp": "^0.5.0"
+  }
+}
