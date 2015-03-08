@@ -11,7 +11,7 @@ const command =
 copy file globs, watching for changes.
 
   <source>: target file globs.
-            e.g. src/**/*.[html,png,jpg]
+            e.g. src/**/*.{html,png,jpg}
   <dest>:   a path of destination directory.
             e.g. app
 `.trim())
