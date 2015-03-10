@@ -7,24 +7,13 @@ import {Minimatch} from "minimatch";
 import {Glob, sync as searchSync} from "glob";
 import getBasePath from "glob2base";
 import {watch as createWatcher} from "chokidar";
+import {assert, assertType, assertTypeOpt} from "./utils";
+import Queue from "./queue";
 
-function assert(condition, message) {
-  if (!condition) {
-    throw new Error(message);
-  }
-}
-
-function assertType(value, name, type) {
-  if (typeof value !== type) {
-    throw new TypeError(`${name} should be a ${type}.`);
-  }
-}
-
-function assertTypeOpt(value, name, type) {
-  if (value != null && typeof value !== type) {
-    throw new TypeError(`${name} should be a ${type} or null.`);
-  }
-}
+const SOURCE = Symbol("source");
+const OUT_DIR = Symbol("outDir");
+const QUEUE = Symbol("queue");
+const WATCHER = Symbol("watcher");
 
 // Glob is not supported delimiters of Windows.
 function normalizePath(path) {
@@ -38,24 +27,13 @@ function normalizePath(path) {
   return path;
 }
 
-// Process actions in queue sequentially.
-function dequeue(cpx, item) {
-  item.action(() => {
-    if (item.next) {
-      dequeue(cpx, item.next);
-    }
-    else {
-      assert(cpx.queue === item, "Why?");
-      cpx.queue = null;
-    }
-  });
-}
-
+// Call the action for every files that matches the pattern.
 function doAllSimply(cpx, pattern, action) {
   new Glob(pattern, {nodir: true, silent: true})
     .on("match", action.bind(cpx));
 }
 
+// Call the action for every files that matches the pattern.
 function doAll(cpx, pattern, action, cb) {
   if (cb == null) {
     doAllSimply(cpx, pattern, action);
@@ -65,7 +43,7 @@ function doAll(cpx, pattern, action, cb) {
   let count = 0;
   let done = false;
   let lastError = null;
-  let cbIfEnd = () => {
+  const cbIfEnd = () => {
     if (done && count === 0) { cb(lastError); }
   };
 
@@ -90,68 +68,81 @@ function doAll(cpx, pattern, action, cb) {
 }
 
 export default class Cpx extends EventEmitter {
+  /**
+   * @param {string} source - A blob for copy files.
+   * @param {string} outDir - A file path for the destination directory.
+   */
   constructor(source, outDir) {
     assertType(source, "source", "string");
     assertType(outDir, "outDir", "string");
 
-    this.source = normalizePath(source);
-    this.outDir = normalizePath(outDir);
-    this.queues = Object.create(null);
-    this.watcher = null;
+    this[SOURCE] = normalizePath(source);
+    this[OUT_DIR] = normalizePath(outDir);
+    this[QUEUE] = new Queue();
+    this[WATCHER] = null;
   }
 
-  // The base directory of `this.source`.
+  //============================================================================
+  // Commons
+  //----------------------------------------------------------------------------
+
+  /**
+   * The source file glob to copy.
+   * @type {string}
+   */
+  get source() {
+    return this[SOURCE];
+  }
+
+  /**
+   * The destination directory to copy.
+   * @type {string}
+   */
+  get outDir() {
+    return this[OUT_DIR];
+  }
+
+  /**
+   * The base directory of `this.source`.
+   * @type {string}
+   */
   get base() {
-    let value = normalizePath(getBasePath(new Glob(this.source)));
+    const value = normalizePath(getBasePath(new Glob(this.source)));
     Object.defineProperty(this, "base", {value, configurable: true});
     return value;
   }
 
-  // Glob patterns that matches on `this.outDir`.
-  get dest() {
-    let value = this.src2dst(this.source);
-    Object.defineProperty(this, "dest", {value, configurable: true});
-    return value;
-  }
-
-  // Convert a glob pattern from source to destination.
+  /**
+   * Convert a glob from source to destination.
+   * @param {string} path
+   * @returns {string}
+   */
   src2dst(path) {
     assertType(path, "path", "string");
-    let value = path.replace(this.base, this.outDir);
-    return value;
+    return path.replace(this.base, this.outDir);
   }
 
-  // To process files sequentially, add an action to queue.
-  enqueue(action) {
-    assertType(action, "action", "function");
-
-    let item = {action, next: null};
-    if (this.queue != null) {
-      this.queue.next = item;
-      this.queue = item;
-    }
-    else {
-      this.queue = item;
-      dequeue(this, item);
-    }
-  }
-
+  /**
+   * Copy a file sequentially.
+   * @param {string} srcPath
+   * @param {cpx~callback} [cb = null]
+   */
   enqueueCopy(srcPath, cb = null) {
     assertType(srcPath, "srcPath", "string");
     assertTypeOpt(cb, "cb", "function");
 
-    let dstPath = this.src2dst(srcPath);
+    const dstPath = this.src2dst(srcPath);
     if (dstPath === srcPath) {
       if (cb != null) {
-        cb(null);
+        setImmediate(cb, null);
         return;
       }
     }
 
-    this.enqueue(next => {
+    this[QUEUE].push(next => {
       mkdir(dirname(dstPath), next);
     });
-    this.enqueue(next => {
+    this[QUEUE].push(next => {
       cp(srcPath, dstPath, err => {
         if (err == null) {
           this.emit("copy", {srcPath, dstPath});
@@ -165,12 +156,17 @@ export default class Cpx extends EventEmitter {
     });
   }
 
+  /**
+   * Remove a file sequentially.
+   * @param {string} path
+   * @param {cpx~callback} [cb = null]
+   */
   enqueueRemove(path, cb = null) {
     assertType(path, "path", "string");
     assertTypeOpt(cb, "cb", "function");
 
     let lastError = null;
-    this.enqueue(next => {
+    this[QUEUE].push(next => {
       unlink(path, err => {
         if (err == null) {
           this.emit("remove", {path});
@@ -180,7 +176,7 @@ export default class Cpx extends EventEmitter {
         next();
       });
     });
-    this.enqueue(next => {
+    this[QUEUE].push(next => {
       rmdir(dirname(path), () => {
         next();
         if (cb != null) {
@@ -190,24 +186,41 @@ export default class Cpx extends EventEmitter {
     });
   }
 
-  clean(cb) {
+  //============================================================================
+  // Clean Methods
+  //----------------------------------------------------------------------------
+
+  /**
+   * Remove all files that matches `this.source` like pattern in `this.dest`
+   * directory.
+   * @param {cpx~callback} [cb = null]
+   */
+  clean(cb = null) {
     assertTypeOpt(cb, "cb", "function");
-    if (this.dest === this.source) {
+
+    const dest = this.src2dst(this.source);
+    if (dest === this.source) {
       if (cb != null) {
-        cb(null);
+        setImmediate(cb, null);
       }
       return;
     }
 
-    doAll(this, this.dest, this.enqueueRemove, cb);
+    doAll(this, dest, this.enqueueRemove, cb);
   }
 
+  /**
+   * Remove all files that matches `this.source` like pattern in `this.dest`
+   * directory.
+   * @thrpws {Error} IO error.
+   */
   cleanSync() {
-    if (this.dest === this.source) {
+    const dest = this.src2dst(this.source);
+    if (dest === this.source) {
       return;
     }
 
-    let pathes = searchSync(this.dest, {nodir: true, silent: true});
+    let pathes = searchSync(dest, {nodir: true, silent: true});
     pathes.forEach(path => {
       unlinkSync(path);
       try {
@@ -222,11 +235,23 @@ export default class Cpx extends EventEmitter {
     });
   }
 
+  //============================================================================
+  // Copy Methods
+  //----------------------------------------------------------------------------
+
+  /**
+   * Copy all files that matches `this.source` pattern to `this.outDir`.
+   * @param {cpx~callback} [cb = null]
+   */
   copy(cb = null) {
     assertTypeOpt(cb, "cb", "function");
     doAll(this, this.source, this.enqueueCopy, cb);
   }
 
+  /**
+   * Copy all files that matches `this.source` pattern to `this.outDir`.
+   * @thrpws {Error} IO error.
+   */
   copySync() {
     let srcPathes = searchSync(this.source, {nodir: true, silent: true});
     srcPathes.forEach(srcPath => {
@@ -242,19 +267,30 @@ export default class Cpx extends EventEmitter {
     });
   }
 
+  //============================================================================
+  // Watch Methods
+  //----------------------------------------------------------------------------
+
+  /**
+   * Copy all files that matches `this.source` pattern to `this.outDir`.
+   * And watch changes in `this.base`, and copy only the file every time.
+   * @throws {Error} This had been watching already.
+   */
   watch() {
-    this.unwatch();
+    if (this[WATCHER] != null) {
+      throw new Error("InvalidStateError");
+    }
 
     const m = new Minimatch(this.source);
     let firstCopyCount = 0;
     let ready = false;
-    let fireReadyIfReady = () => {
+    const fireReadyIfReady = () => {
       if (ready && firstCopyCount === 0) {
         this.emit("watch-ready");
       }
     };
 
-    this.watcher =
+    this[WATCHER] =
       createWatcher(this.base, {cwd: process.cwd(), persistent: true})
         .on("add", path => {
           path = normalizePath(path);
@@ -274,7 +310,7 @@ export default class Cpx extends EventEmitter {
         .on("unlink", path => {
           path = normalizePath(path);
           if (m.match(path)) {
-            let dstPath = this.src2dst(path);
+            const dstPath = this.src2dst(path);
             if (dstPath !== path) {
               this.enqueueRemove(dstPath);
             }
@@ -295,14 +331,20 @@ export default class Cpx extends EventEmitter {
         });
   }
 
+  /**
+   * Stop watching.
+   */
   unwatch() {
-    if (this.watcher != null) {
-      this.watcher.close();
-      this.watcher = null;
+    if (this[WATCHER] != null) {
+      this[WATCHER].close();
+      this[WATCHER] = null;
     }
   }
 
+  /**
+   * Stop watching.
+   */
   close() {
     this.unwatch();
   }
-}
+};

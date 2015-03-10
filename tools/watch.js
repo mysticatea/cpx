@@ -1,5 +1,5 @@
 var exec = require("child_process").exec;
-var babel = exec("babel src --out-dir lib --watch");
+var babel = exec("babel src --out-dir lib --watch --source-maps-inline");
 var mocha = exec("mocha test/*.js --compilers js:babel/register --timeout 5000 --watch --colors");
 
 babel.stdout.pipe(process.stdout);

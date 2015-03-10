@@ -20,12 +20,15 @@
     "url": "https://github.com/mysticatea/cpx.git"
   },
   "keywords": [
+    "cp",
+    "cli",
+    "tool",
+    "commandline",
     "sync",
     "rsync",
     "watch",
     "observe",
     "copy",
-    "transfer",
     "dir",
     "directory",
     "directories",
@@ -41,7 +44,7 @@
   "devDependencies": {
     "babel": "^4.7.1",
     "chai": "^2.1.1",
-    "eslint": "^0.16.0",
+    "eslint": "^0.16.1",
     "mocha": "^2.2.0",
     "rimraf": "^2.3.1"
   },
@@ -52,6 +55,7 @@
     "glob": "^5.0.0",
     "glob2base": "0.0.12",
     "minimatch": "^2.0.1",
-    "mkdirp": "^0.5.0"
+    "mkdirp": "^0.5.0",
+    "subarg": "^1.0.0"
   }
 }

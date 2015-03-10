@@ -6,7 +6,7 @@
   "ecmaFeatures": {
     "arrowFunctions": true,
     "binaryLiterals": true,
-    "blockBindings": false,
+    "blockBindings": true,
     "classes": true,
     "defaultParams": true,
     "destructuring": true,
