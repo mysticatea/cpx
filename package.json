@@ -44,13 +44,12 @@
   "devDependencies": {
     "babel": "^4.7.1",
     "chai": "^2.1.1",
-    "eslint": "^0.16.1",
+    "eslint": "^0.16.2",
     "mocha": "^2.2.0",
     "rimraf": "^2.3.1"
   },
   "dependencies": {
     "chokidar": "^1.0.0-rc4",
-    "commander": "^2.6.0",
     "cp": "^0.2.0",
     "glob": "^5.0.0",
     "glob2base": "0.0.12",
