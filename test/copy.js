@@ -4,6 +4,7 @@ import * as cpx from "../lib/index";
 import {setupTestDir,
         teardownTestDir,
         content} from "./util/util";
+import upperify from "./util/upperify";
 
 describe("The copy method", () => {
 
@@ -105,4 +106,38 @@ describe("The copy method", () => {
 
   });
 
+  describe("should copy with transform if specified transform option.", () => {
+    beforeEach(() => {
+      setupTestDir({
+        "test-ws/a/hello.txt": "Hello"
+      });
+    });
+    afterEach(() => {
+      teardownTestDir("test-ws");
+    });
+
+    function verifyFiles() {
+      expect(content("test-ws/b/hello.txt")).to.equal("HELLO");
+    }
+
+    it("lib async version.", done => {
+      cpx.copy("test-ws/a/**/*.txt", "test-ws/b", {transform: upperify}, err => {
+        expect(err).to.be.null;
+        verifyFiles();
+        done();
+      });
+    });
+
+    it("should throw an error on lib sync version (cannot use streaming api).", () => {
+      expect(() => {
+        cpx.copySync("test-ws/a/**/*.txt", "test-ws/b", {transform: upperify});
+      }).to.throw(Error);
+    });
+
+    it("command version.", () => {
+      execSync("node lib/command.js test-ws/a/**/*.txt test-ws/b --transform ./test/util/upperify");
+      verifyFiles();
+    });
+
+  });
 });

@@ -1,6 +1,8 @@
 /*eslint no-process-exit:0*/
 import {readFileSync} from "fs";
-import {join as joinPath} from "path";
+import {join as joinPath,
+        resolve as resolvePath} from "path";
+import {sync as resolveModule} from "resolve";
 import subarg from "subarg";
 import Cpx from "./cpx";
 
@@ -16,40 +18,52 @@ Usage: cpx <source> <dest> [options]
 
 Options:
 
-  -c, --clean     Clean files that matches <source> like pattern in <dest>
-                  directory before the first copying.
-  -h, --help      Print usage information
-  -v, --verbose   Print copied/removed files.
-  -V, --version   Print the version number
-  -w, --watch     Watch for files that matches <source>, and copy the file to
-                  <dest> every changing.
+  -c, --clean       Clean files that matches <source> like pattern in <dest>
+                    directory before the first copying.
+  -h, --help        Print usage information
+  -t, --transform   A transform module name. cpx lookups the specified name via
+                    "require()". You can give "-t" multiple.
+  -v, --verbose     Print copied/removed files.
+  -V, --version     Print the version number
+  -w, --watch       Watch for files that matches <source>, and copy the file to
+                    <dest> every changing.
+
+See Also:
+  https://github.com/mysticatea/cpx
 `;
 
-const KNOWN_OPTIONS = new Set([
-  "_",
-  "c", "clean",
-  "h", "help",
-  "v", "verbose",
-  "V", "version",
-  "w", "watch"
-]);
+// {Shorname: Fullname}
+const OPTIONS = {
+  "c": "clean",
+  "h": "help",
+  "t": "transform",
+  "v": "verbose",
+  "V": "version",
+  "w": "watch"
+};
 
+//------------------------------------------------------------------------------
 // Parse arguments.
 const args = subarg(process.argv.slice(2), {
   boolean: ["clean", "help", "verbose", "version", "watch"],
-  alias: {c: "clean", h: "help", v: "verbose", V: "version", w: "watch"}
+  alias: OPTIONS
 });
 
+//------------------------------------------------------------------------------
 // Validate Options.
-{
-  const unknowns = Object.keys(args).filter(key => !KNOWN_OPTIONS.has(key));
-  if (unknowns.length > 0) {
-    console.error(`Unknown option(s): ${unknowns.join(", ")}`);
-    console.log(HELP_TEXT);
-    process.exit(1);
-  }
+const knowns = new Set(["_"]);
+for (let key in OPTIONS) {
+  knowns.add(key);
+  knowns.add(OPTIONS[key]);
+}
+const unknowns = Object.keys(args).filter(key => !knowns.has(key));
+if (unknowns.length > 0) {
+  console.error(`Unknown option(s): ${unknowns.join(", ")}`);
+  console.log(HELP_TEXT);
+  process.exit(1);
 }
 
+//------------------------------------------------------------------------------
 // Help/Version.
 if (args.help) {
   console.log(HELP_TEXT);
@@ -61,6 +75,7 @@ if (args.version) {
   process.exit(0);
 }
 
+//------------------------------------------------------------------------------
 // Validate Arguments.
 const source = args._[0];
 const outDir = args._[1];
@@ -70,8 +85,32 @@ if (source == null || outDir == null || args.length > 2) {
 }
 
 //------------------------------------------------------------------------------
+// Resolve Transforms.
+const ABS_OR_REL = /^[.\/]/;
+const transform =
+  [].concat(args.transform)
+    .filter(Boolean)
+    .map(arg => {
+      if (typeof arg === "string") {
+        return {name: arg, argv: null};
+      }
+      if (typeof arg._[0] === "string") {
+        return {name: arg._.shift(), argv: arg};
+      }
+      console.error("Invalid --transform option");
+      process.exit(1);
+    })
+    .map(item => {
+        const createStream = (ABS_OR_REL.test(item.name) ?
+          require(resolvePath(item.name)) :
+          require(resolveModule(item.name, {basedir: process.cwd()}))
+        );
+        return file => createStream(file, item.argv);
+    });
+
+//------------------------------------------------------------------------------
 // Main.
-let cpx = new Cpx(source, outDir);
+const cpx = new Cpx(source, outDir, {transform});
 if (args.verbose) {
   cpx.on("copy", e => {
     console.log(`Copied: ${e.srcPath} --> ${e.dstPath}`);
@@ -92,6 +131,7 @@ if (args.clean) {
   }
   catch (err) {
     console.error(`Failed to clean: ${err.message}.`);
+    process.exit(1);
   }
   if (args.verbose) {
     console.log();
@@ -112,6 +152,7 @@ if (args.watch) {
     console.error(err.message);
   });
 
+  // In order to kill me by test harness on Windows.
   process.stdin.setEncoding("utf8");
   process.stdin.on("data", chunk => {
     if (chunk === "KILL") {
@@ -122,10 +163,10 @@ if (args.watch) {
   cpx.watch();
 }
 else {
-  try {
-    cpx.copySync();
-  }
-  catch (err) {
-    console.error(`Failed to copy: ${err.message}.`);
-  }
+  cpx.copy(err => {
+    if (err) {
+      console.error(`Failed to copy: ${err.message}.`);
+      process.exit(1);
+    }
+  });
 }

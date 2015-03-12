@@ -4,32 +4,41 @@ Copy file globs, watching for changes.
 
 This module provides a CLI tool like `cp`, but with watching.
 
+(This module is dogfooding currently.)
+
+
 ## Installation
 
 ```
 npm install cpx
 ```
 
+
 ## Usage
 
 ```
 Usage: cpx <source> <dest> [options]
 
-  copy file globs, watching for changes.
+  Copy file globs, watching for changes.
 
-  <source>: target file globs.
-            e.g. src/**/*.{html,png,jpg}
-  <dest>:   a path of destination directory.
-            e.g. app
+    <source>  A file glob of target files.
+              e.g. src/**/*.{html,png,jpg}
+    <dest>    A path of destination directory.
+              e.g. app
 
 Options:
 
-  -h, --help     output usage information
-  -V, --version  output the version number
-  --clean        clean files that matches <source> pattern in <dest> directory before copying.
-  -w, --watch    watch for files that matches <source> pattern, then copy to <dest> on changed.
-  -v, --verbose  print copied/removed files.
+  -c, --clean       Clean files that matches <source> like pattern in <dest>
+                    directory before the first copying.
+  -h, --help        Print usage information
+  -t, --transform   A transform module name. cpx lookups the specified name via
+                    "require()". You can give "-t" multiple.
+  -v, --verbose     Print copied/removed files.
+  -V, --version     Print the version number
+  -w, --watch       Watch for files that matches <source>, and copy the file to
+                    <dest> every changing.
 ```
+
 
 ## Example
 
@@ -37,7 +46,8 @@ Options:
 cpx src/**/*.{html,png,jpg} app --watch
 ```
 
-This example will copy html/png/jpg files from `src` directory to `app` directory, keeping file tree structure.
+This example will copy html/png/jpg files from `src` directory to `app`
+directory, keeping file tree structure.
 And every time the files are changed, copy them.
 
 You can use together [Browserify](http://browserify.org).
@@ -45,6 +55,15 @@ You can use together [Browserify](http://browserify.org).
 ```
 cpx src/**/*.{html,png,jpg} app -w & watchify src/index.js -o app/index.js
 ```
+
+You can use the transform packages for Browserify.
+
+```
+cpx src/**/*.js app -w -t babelify -t uglifyify
+```
+
+It maybe can use to add header comment, to optimize images, or etc...
+
 
 ## Node.js API
 

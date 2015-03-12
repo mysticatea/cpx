@@ -1,17 +1,18 @@
 import {EventEmitter} from "events";
 import {dirname} from "path";
 import {unlink, unlinkSync, rmdir, rmdirSync} from "fs";
-import cp, {sync as cpSync} from "cp";
 import mkdir, {sync as mkdirSync} from "mkdirp";
 import {Minimatch} from "minimatch";
 import {Glob, sync as searchSync} from "glob";
 import getBasePath from "glob2base";
 import {watch as createWatcher} from "chokidar";
+import {copy, copySync} from "./copy";
 import {assert, assertType, assertTypeOpt} from "./utils";
 import Queue from "./queue";
 
 const SOURCE = Symbol("source");
 const OUT_DIR = Symbol("outDir");
+const TRANSFORM = Symbol("watcher");
 const QUEUE = Symbol("queue");
 const WATCHER = Symbol("watcher");
 
@@ -72,12 +73,16 @@ export default class Cpx extends EventEmitter {
    * @param {string} source - A blob for copy files.
    * @param {string} outDir - A file path for the destination directory.
    */
-  constructor(source, outDir) {
+  constructor(source, outDir, options) {
     assertType(source, "source", "string");
     assertType(outDir, "outDir", "string");
 
+    const transforms = [].concat(options && options.transform).filter(Boolean);
+    transforms.forEach(t => assertType(t, "transform", "function"));
+
     this[SOURCE] = normalizePath(source);
     this[OUT_DIR] = normalizePath(outDir);
+    this[TRANSFORM] = transforms;
     this[QUEUE] = new Queue();
     this[WATCHER] = null;
   }
@@ -100,6 +105,14 @@ export default class Cpx extends EventEmitter {
    */
   get outDir() {
     return this[OUT_DIR];
+  }
+
+  /**
+   * The factories of transform streams.
+   * @type {function[]}
+   */
+  get transformFactories() {
+    return this[TRANSFORM];
   }
 
   /**
@@ -143,7 +156,7 @@ export default class Cpx extends EventEmitter {
       mkdir(dirname(dstPath), next);
     });
     this[QUEUE].push(next => {
-      cp(srcPath, dstPath, err => {
+      copy(srcPath, dstPath, this.transformFactories, err => {
         if (err == null) {
           this.emit("copy", {srcPath, dstPath});
         }
@@ -253,6 +266,9 @@ export default class Cpx extends EventEmitter {
    * @thrpws {Error} IO error.
    */
   copySync() {
+    assert(this.transformFactories.length === 0,
+           "Synchronous copy can't use the transform option.");
+
     let srcPathes = searchSync(this.source, {nodir: true, silent: true});
     srcPathes.forEach(srcPath => {
       let dstPath = this.src2dst(srcPath);
@@ -261,7 +277,7 @@ export default class Cpx extends EventEmitter {
       }
 
       mkdirSync(dirname(dstPath));
-      cpSync(srcPath, dstPath);
+      copySync(srcPath, dstPath);
 
       this.emit("copy", {srcPath, dstPath});
     });

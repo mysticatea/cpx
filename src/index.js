@@ -8,7 +8,7 @@ export function copy(source, outDir, options = null, cb = null) {
     options = null;
   }
 
-  let cpx = new Cpx(source, outDir);
+  let cpx = new Cpx(source, outDir, options);
   if (options && options.clean) {
     cpx.clean(err => {
       if (err == null) {
@@ -27,7 +27,7 @@ export function copy(source, outDir, options = null, cb = null) {
 };
 
 export function copySync(source, outDir, options = null) {
-  let cpx = new Cpx(source, outDir);
+  let cpx = new Cpx(source, outDir, options);
   if (options && options.clean) {
     cpx.cleanSync();
   }
@@ -35,7 +35,7 @@ export function copySync(source, outDir, options = null) {
 };
 
 export function watch(source, outDir, options = null) {
-  let cpx = new Cpx(source, outDir);
+  let cpx = new Cpx(source, outDir, options);
   if (options && options.clean) {
     cpx.clean(err => {
       if (err == null) {
