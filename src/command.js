@@ -2,7 +2,10 @@
 import {readFileSync} from "fs";
 import {join as joinPath,
         resolve as resolvePath} from "path";
+import {spawn} from "child_process";
 import {sync as resolveModule} from "resolve";
+import {parse as parseShellQuote} from "shell-quote";
+import duplexer from "duplexer";
 import subarg from "subarg";
 import Cpx from "./cpx";
 
@@ -18,15 +21,16 @@ Usage: cpx <source> <dest> [options]
 
 Options:
 
-  -c, --clean       Clean files that matches <source> like pattern in <dest>
-                    directory before the first copying.
-  -h, --help        Print usage information
-  -t, --transform   A transform module name. cpx lookups the specified name via
-                    "require()". You can give "-t" multiple.
-  -v, --verbose     Print copied/removed files.
-  -V, --version     Print the version number
-  -w, --watch       Watch for files that matches <source>, and copy the file to
-                    <dest> every changing.
+  -c, --command <command>   A command text to transform each file.
+  -C, --clean               Clean files that matches <source> like pattern in
+                            <dest> directory before the first copying.
+  -h, --help                Print usage information
+  -t, --transform <name>    A module name to transform each file. cpx lookups
+                            the specified name via "require()".
+  -v, --verbose             Print copied/removed files.
+  -V, --version             Print the version number
+  -w, --watch               Watch for files that matches <source>, and copy the
+                            file to <dest> every changing.
 
 See Also:
   https://github.com/mysticatea/cpx
@@ -34,7 +38,8 @@ See Also:
 
 // {Shorname: Fullname}
 const OPTIONS = {
-  "c": "clean",
+  "c": "command",
+  "C": "clean",
   "h": "help",
   "t": "transform",
   "v": "verbose",
@@ -59,7 +64,6 @@ for (let key in OPTIONS) {
 const unknowns = Object.keys(args).filter(key => !knowns.has(key));
 if (unknowns.length > 0) {
   console.error(`Unknown option(s): ${unknowns.join(", ")}`);
-  console.log(HELP_TEXT);
   process.exit(1);
 }
 
@@ -85,9 +89,37 @@ if (source == null || outDir == null || args.length > 2) {
 }
 
 //------------------------------------------------------------------------------
+// Resolve Command.
+const commands =
+  [].concat(args.command)
+    .filter(Boolean)
+    .map(command => {
+      if (typeof command !== "string") {
+        console.error("Invalid --command option");
+        process.exit(1);
+      }
+      return file => {
+          const env = Object.create(process.env, {FILE: {value: file}});
+          const parts = parseShellQuote(command, env);
+          const child = spawn(parts[0], parts.slice(1), {env});
+          const outer = duplexer(child.stdin, child.stdout);
+          child.on("exit", function(code) {
+            if (code !== 0) {
+              outer.emit(
+                "error",
+                new Error("non-zero exit code in command: " + command));
+            }
+          });
+          child.stderr.pipe(process.stderr);
+
+          return outer;
+      };
+  });
+
+//------------------------------------------------------------------------------
 // Resolve Transforms.
 const ABS_OR_REL = /^[.\/]/;
-const transform =
+const transforms =
   [].concat(args.transform)
     .filter(Boolean)
     .map(arg => {
@@ -109,8 +141,25 @@ const transform =
     });
 
 //------------------------------------------------------------------------------
+// Merge commands and transforms as same as order of process.argv.
+const C_OR_COMMAND = /^(?:-c|--command)$/;
+const T_OR_TRANSFORM = /^(?:-t|--transform)$/;
+const mergedTransformFactories =
+  process.argv
+    .map(part => {
+      if (C_OR_COMMAND.test(part)) {
+        return commands.shift();
+      }
+      if (T_OR_TRANSFORM.test(part)) {
+        return transforms.shift();
+      }
+      return null;
+    })
+    .filter(Boolean);
+
+//------------------------------------------------------------------------------
 // Main.
-const cpx = new Cpx(source, outDir, {transform});
+const cpx = new Cpx(source, outDir, {transform: mergedTransformFactories});
 if (args.verbose) {
   cpx.on("copy", e => {
     console.log(`Copied: ${e.srcPath} --> ${e.dstPath}`);

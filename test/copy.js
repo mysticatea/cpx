@@ -106,6 +106,27 @@ describe("The copy method", () => {
 
   });
 
+  describe("should copy with transform if specified command option.", () => {
+    beforeEach(() => {
+      setupTestDir({
+        "test-ws/a/hello.txt": "Hello"
+      });
+    });
+    afterEach(() => {
+      teardownTestDir("test-ws");
+    });
+
+    function verifyFiles() {
+      expect(content("test-ws/b/hello.txt")).to.equal("HELLO");
+    }
+
+    it("command version.", () => {
+      execSync("node lib/command.js test-ws/a/**/*.txt test-ws/b --command \"node ./test/util/upperify.js\"");
+      verifyFiles();
+    });
+
+  });
+
   describe("should copy with transform if specified transform option.", () => {
     beforeEach(() => {
       setupTestDir({
@@ -140,4 +161,26 @@ describe("The copy method", () => {
     });
 
   });
+
+  describe("should keep order even if -c and -t are mixed.", () => {
+    beforeEach(() => {
+      setupTestDir({
+        "test-ws/a/hello.txt": "Hello"
+      });
+    });
+    afterEach(() => {
+      teardownTestDir("test-ws");
+    });
+
+    function verifyFiles() {
+      expect(content("test-ws/b/hello.txt")).to.equal("Helloabcd");
+    }
+
+    it("command version.", () => {
+      execSync("node lib/command.js test-ws/a/**/*.txt test-ws/b -c \"node ./test/util/appendify.js a\" -t [./test/util/appendify b] -c \"node ./test/util/appendify.js c\" -t [./test/util/appendify d]");
+      verifyFiles();
+    });
+
+  });
+
 });

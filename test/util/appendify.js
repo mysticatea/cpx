@@ -1,7 +1,9 @@
 /*eslint no-process-exit:0*/
 var through = require("through");
 
-var toUpperCase = module.exports = function toUpperCase() {
+var postfix = process.argv[2] || "";
+
+var appenda = module.exports = function appenda(filename, args) {
   var buffer = new Buffer(0);
   return through(
     function write(data) {
@@ -12,7 +14,12 @@ var toUpperCase = module.exports = function toUpperCase() {
     },
     function end() {
       if (buffer.length > 0) {
-        this.queue(buffer.toString().toUpperCase());
+        this.queue(buffer.toString());
+      }
+
+      var value = (args && args._ && args._[0]) || postfix || "";
+      if (value) {
+        this.queue(value);
       }
       this.queue(null);
     }
@@ -20,5 +27,5 @@ var toUpperCase = module.exports = function toUpperCase() {
 };
 
 if (require.main === module) {
-  process.stdin.pipe(toUpperCase()).pipe(process.stdout);
+  process.stdin.pipe(appenda()).pipe(process.stdout);
 }

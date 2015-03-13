@@ -51,11 +51,13 @@
   },
   "dependencies": {
     "chokidar": "^1.0.0-rc4",
+    "duplexer": "^0.1.1",
     "glob": "^5.0.0",
     "glob2base": "0.0.12",
     "minimatch": "^2.0.3",
     "mkdirp": "^0.5.0",
     "resolve": "^1.1.5",
+    "shell-quote": "^1.4.3",
     "subarg": "^1.0.0"
   }
 }

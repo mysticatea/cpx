@@ -28,15 +28,16 @@ Usage: cpx <source> <dest> [options]
 
 Options:
 
-  -c, --clean       Clean files that matches <source> like pattern in <dest>
-                    directory before the first copying.
-  -h, --help        Print usage information
-  -t, --transform   A transform module name. cpx lookups the specified name via
-                    "require()". You can give "-t" multiple.
-  -v, --verbose     Print copied/removed files.
-  -V, --version     Print the version number
-  -w, --watch       Watch for files that matches <source>, and copy the file to
-                    <dest> every changing.
+  -c, --command <command>   A command text to transform each file.
+  -C, --clean               Clean files that matches <source> like pattern in
+                            <dest> directory before the first copying.
+  -h, --help                Print usage information
+  -t, --transform <name>    A module name to transform each file. cpx lookups
+                            the specified name via "require()".
+  -v, --verbose             Print copied/removed files.
+  -V, --version             Print the version number
+  -w, --watch               Watch for files that matches <source>, and copy the
+                            file to <dest> every changing.
 ```
 
 
@@ -54,6 +55,12 @@ You can use together [Browserify](http://browserify.org).
 
 ```
 cpx src/**/*.{html,png,jpg} app -w & watchify src/index.js -o app/index.js
+```
+
+You can use shell commands to convert each file.
+
+```
+cpx src/**/*.js app -w -c "babel --source-maps-inline"
 ```
 
 You can use the transform packages for Browserify.
