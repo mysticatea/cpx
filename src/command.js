@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /*eslint no-process-exit:0*/
 import {readFileSync} from "fs";
 import {join as joinPath,
