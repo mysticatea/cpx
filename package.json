@@ -12,8 +12,10 @@
   "scripts": {
     "build": "babel src --out-dir lib",
     "lint": "eslint src && eslint test",
-    "test": "mocha test/*.js --compilers js:babel/register",
-    "testing": "node tools/watch.js"
+    "test": "npm run build && mocha test/*.js --compilers js:babel/register --timeout 5000 --colors",
+    "testing": "run-all \"npm run testing:babel\" \"npm run testing:mocha\"",
+    "testing:babel": "babel src --out-dir lib --watch --source-maps-inline",
+    "testing:mocha": "mocha test/*.js --compilers js:babel/register --timeout 5000 --watch --colors"
   },
   "repository": {
     "type": "git",
@@ -47,6 +49,7 @@
     "eslint": "^0.16.2",
     "mocha": "^2.2.0",
     "rimraf": "^2.3.1",
+    "run-all": "^1.0.1",
     "through": "^2.3.6"
   },
   "dependencies": {
