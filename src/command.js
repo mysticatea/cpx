@@ -56,12 +56,6 @@ const args = subarg(process.argv.slice(2), {
   alias: OPTIONS
 });
 
-if (process.argv.some(s => s === "-v" || s === "-V")) {
-  console.error(
-    "\u001b[33mWARNING: the options -v and -V will be exchanged soon. " +
-    "Please use long name until.\u001b[0m");
-}
-
 //------------------------------------------------------------------------------
 // Validate Options.
 const knowns = new Set(["_"]);
