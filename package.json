@@ -10,7 +10,7 @@
     "lib"
   ],
   "scripts": {
-    "build": "babel src --out-dir lib",
+    "build": "eslint src && babel src --out-dir lib",
     "lint": "eslint src && eslint test",
     "test": "npm run build && mocha test/*.js --compilers js:babel/register --timeout 5000 --colors",
     "testing": "run-all \"npm run testing:babel\" \"npm run testing:mocha\"",
@@ -44,22 +44,22 @@
   },
   "homepage": "https://github.com/mysticatea/cpx",
   "devDependencies": {
-    "babel": "^4.7.1",
-    "chai": "^2.1.1",
-    "eslint": "^0.16.2",
-    "mocha": "^2.2.0",
-    "rimraf": "^2.3.1",
+    "babel": "^4.7.15",
+    "chai": "^2.1.2",
+    "eslint": "^0.17.1",
+    "mocha": "^2.2.1",
+    "rimraf": "^2.3.2",
     "run-all": "^1.0.1",
     "through": "^2.3.6"
   },
   "dependencies": {
     "chokidar": "^1.0.0-rc4",
     "duplexer": "^0.1.1",
-    "glob": "^5.0.0",
+    "glob": "^5.0.3",
     "glob2base": "0.0.12",
-    "minimatch": "^2.0.3",
+    "minimatch": "^2.0.4",
     "mkdirp": "^0.5.0",
-    "resolve": "^1.1.5",
+    "resolve": "^1.1.6",
     "shell-quote": "^1.4.3",
     "subarg": "^1.0.0"
   }
