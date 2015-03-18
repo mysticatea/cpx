@@ -24,7 +24,7 @@ export function copy(source, outDir, options = null, cb = null) {
   }
 
   return cpx;
-};
+}
 
 export function copySync(source, outDir, options = null) {
   let cpx = new Cpx(source, outDir, options);
@@ -32,7 +32,7 @@ export function copySync(source, outDir, options = null) {
     cpx.cleanSync();
   }
   cpx.copySync();
-};
+}
 
 export function watch(source, outDir, options = null) {
   let cpx = new Cpx(source, outDir, options);
@@ -51,4 +51,4 @@ export function watch(source, outDir, options = null) {
   }
 
   return cpx;
-};
+}

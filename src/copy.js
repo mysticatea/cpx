@@ -53,7 +53,7 @@ export function copy(src, dst, transformFactories, cb) {
   catch (err) {
     done(err);
   }
-};
+}
 
 /**
  * @param {string} src - A path of the source file.
@@ -81,4 +81,4 @@ export function copySync(src, dst) {
   finally {
     closeSync(input);
   }
-};
+}

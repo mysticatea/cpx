@@ -363,4 +363,4 @@ export default class Cpx extends EventEmitter {
   close() {
     this.unwatch();
   }
-};
+}

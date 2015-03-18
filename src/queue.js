@@ -32,4 +32,4 @@ export default class Queue {
       setImmediate(dequeue, this, item);
     }
   }
-};
+}
