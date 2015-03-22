@@ -175,7 +175,7 @@ if (args.verbose) {
 if (args.clean) {
   if (args.verbose) {
     console.log();
-    console.log(`Clean: ${cpx.dest}`);
+    console.log(`Clean: ${cpx.src2dst(cpx.source)}`);
     console.log();
   }
   try {
