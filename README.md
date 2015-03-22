@@ -1,4 +1,6 @@
-# cpx
+# cpx [![Build Status](https://travis-ci.org/mysticatea/cpx.svg?branch=master)](https://travis-ci.org/mysticatea/cpx)
+
+[![NPM](https://nodei.co/npm/cpx.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/cpx/)
 
 Copy file globs, watching for changes.
 
@@ -10,8 +12,6 @@ This module provides a CLI tool like `cp`, but with watching.
 ```
 npm install cpx
 ```
-
-[![NPM](https://nodei.co/npm/cpx.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/cpx/)
 
 
 ## Usage
@@ -44,7 +44,7 @@ Options:
 ## Example
 
 ```
-cpx src/**/*.{html,png,jpg} app --watch
+cpx "src/**/*.{html,png,jpg}" app --watch
 ```
 
 This example will copy html/png/jpg files from `src` directory to `app`
@@ -54,19 +54,19 @@ Whenever the files are changed, copy them.
 You can use together [Browserify](http://browserify.org).
 
 ```
-cpx src/**/*.{html,png,jpg} app -w & watchify src/index.js -o app/index.js
+cpx "src/**/*.{html,png,jpg}" app -w & watchify src/index.js -o app/index.js
 ```
 
 You can use shell commands to convert each file.
 
 ```
-cpx src/**/*.js app -w -c "babel --source-maps-inline"
+cpx "src/**/*.js" app -w -c "babel --source-maps-inline"
 ```
 
 You can use the transform packages for Browserify.
 
 ```
-cpx src/**/*.js app -w -t babelify -t uglifyify
+cpx "src/**/*.js" app -w -t babelify -t uglifyify
 ```
 
 It maybe can use to add header comment, to optimize images, or etc...
