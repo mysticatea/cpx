@@ -1,6 +1,7 @@
-# cpx [![Build Status](https://travis-ci.org/mysticatea/cpx.svg?branch=master)](https://travis-ci.org/mysticatea/cpx)
+# cpx 
 
-[![NPM](https://nodei.co/npm/cpx.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/cpx/)
+[![Build Status](https://travis-ci.org/mysticatea/cpx.svg?branch=master)](https://travis-ci.org/mysticatea/cpx)
+[![npm version](https://badge.fury.io/js/cpx.svg)](http://badge.fury.io/js/cpx)
 
 Copy file globs, watching for changes.
 
