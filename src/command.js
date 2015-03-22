@@ -86,7 +86,7 @@ if (args.version) {
 // Validate Arguments.
 const source = args._[0];
 const outDir = args._[1];
-if (source == null || outDir == null || args.length > 2) {
+if (source == null || outDir == null || args._.length > 2) {
   console.log(HELP_TEXT);
   process.exit(1);
 }

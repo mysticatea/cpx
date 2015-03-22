@@ -126,7 +126,7 @@ describe("The watch method", () => {
     });
 
     it("command version.", done => {
-      command = exec("node lib/command.js test-ws/a/**/*.txt test-ws/b --watch --verbose");
+      command = exec("node lib/command.js \"test-ws/a/**/*.txt\" test-ws/b --watch --verbose");
       waitForReady(() => {
         verifyFiles();
         done();
@@ -172,7 +172,7 @@ describe("The watch method", () => {
     });
 
     it("command version.", done => {
-      command = exec("node lib/command.js test-ws/a/**/*.txt test-ws/b --clean --watch --verbose");
+      command = exec("node lib/command.js \"test-ws/a/**/*.txt\" test-ws/b --clean --watch --verbose");
       waitForReady(() => {
         verifyFiles();
         done();
@@ -295,7 +295,7 @@ describe("The watch method", () => {
       });
 
       it("command version.", done => {
-        command = exec("node lib/command.js test-ws/a/**/*.txt test-ws/b --watch --verbose");
+        command = exec("node lib/command.js \"test-ws/a/**/*.txt\" test-ws/b --watch --verbose");
         waitForReady(() => {
           item.action();
           item.wait(() => {

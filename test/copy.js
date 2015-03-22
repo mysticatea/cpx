@@ -49,7 +49,7 @@ describe("The copy method", () => {
     });
 
     it("command version.", () => {
-      execSync("node lib/command.js test-ws/a/**/*.txt test-ws/b");
+      execSync("node lib/command.js \"test-ws/a/**/*.txt\" test-ws/b");
       verifyFiles();
     });
 
@@ -100,7 +100,7 @@ describe("The copy method", () => {
     });
 
     it("command version.", () => {
-      execSync("node lib/command.js test-ws/a/**/*.txt test-ws/b --clean");
+      execSync("node lib/command.js \"test-ws/a/**/*.txt\" test-ws/b --clean");
       verifyFiles();
     });
 
@@ -121,7 +121,7 @@ describe("The copy method", () => {
     }
 
     it("command version.", () => {
-      execSync("node lib/command.js test-ws/a/**/*.txt test-ws/b --command \"node ./test/util/upperify.js\"");
+      execSync("node lib/command.js \"test-ws/a/**/*.txt\" test-ws/b --command \"node ./test/util/upperify.js\"");
       verifyFiles();
     });
 
@@ -156,7 +156,7 @@ describe("The copy method", () => {
     });
 
     it("command version.", () => {
-      execSync("node lib/command.js test-ws/a/**/*.txt test-ws/b --transform ./test/util/upperify");
+      execSync("node lib/command.js \"test-ws/a/**/*.txt\" test-ws/b --transform ./test/util/upperify");
       verifyFiles();
     });
 
@@ -177,7 +177,7 @@ describe("The copy method", () => {
     }
 
     it("command version.", () => {
-      execSync("node lib/command.js test-ws/a/**/*.txt test-ws/b -c \"node ./test/util/appendify.js a\" -t [./test/util/appendify b] -c \"node ./test/util/appendify.js c\" -t [./test/util/appendify d]");
+      execSync("node lib/command.js \"test-ws/a/**/*.txt\" test-ws/b -c \"node ./test/util/appendify.js a\" -t [./test/util/appendify b] -c \"node ./test/util/appendify.js c\" -t [./test/util/appendify d]");
       verifyFiles();
     });
 

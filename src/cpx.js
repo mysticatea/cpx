@@ -12,7 +12,7 @@ import Queue from "./queue";
 
 const SOURCE = Symbol("source");
 const OUT_DIR = Symbol("outDir");
-const TRANSFORM = Symbol("watcher");
+const TRANSFORM = Symbol("transform");
 const QUEUE = Symbol("queue");
 const WATCHER = Symbol("watcher");
 
