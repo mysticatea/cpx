@@ -4,14 +4,14 @@ Copy file globs, watching for changes.
 
 This module provides a CLI tool like `cp`, but with watching.
 
-(This module is dogfooding currently.)
-
 
 ## Installation
 
 ```
 npm install cpx
 ```
+
+[![NPM](https://nodei.co/npm/cpx.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/cpx/)
 
 
 ## Usage
@@ -49,7 +49,7 @@ cpx src/**/*.{html,png,jpg} app --watch
 
 This example will copy html/png/jpg files from `src` directory to `app`
 directory, keeping file tree structure.
-And every time the files are changed, copy them.
+Whenever the files are changed, copy them.
 
 You can use together [Browserify](http://browserify.org).
 
@@ -80,27 +80,47 @@ You can use this module as a node module.
 var cpx = require("cpx");
 ```
 
+### cpx.copy
+
 ```ts
-cpx.copy(source: string, dest: string, cb?: (err: Error|null) => void): cpx.Cpx
+cpx.copy(source, dest, options, callback)
+cpx.copy(source, dest, callback)
 ```
 
-Copy files that matches with `source` glob string to `dest` directory.
+- **source** `{string}` -- A file glob of copy targets.
+- **dest** `{string}` -- A file path of a destination directory.
+- **options** `{object}`
+  - **options.clean** `{boolean}` -- A flag to remove files that copied on past before copy.
+  - **options.transform** `{((filepath: string) => stream.Transform)[]}` -- Functions that creates a `stream.Transform` object to transform each copying file.
+- **callback** `{(err: Error|null) => void}` -- A function that is called at done.
+
+Copy files that matches with `source` glob to `dest` directory.
+
+### cpx.copySync
 
 ```ts
-cpx.copySync(source: string, dest: string): void
+cpx.copySync(source, dest, options)
+cpx.copySync(source, dest)
 ```
 
 A synchronous function of `cpx.copy`.
 
+Arguments is almost same as `cpx.copy`.
+But `options.transform` is not supported.
+
+### cpx.watch
+
 ```ts
-cpx.watch(source: string, dest: string): cpx.Cpx
+cpx.watch(source, dest, options)
+cpx.watch(source, dest)
 ```
 
 Copy files that matches with `source` glob string to `dest` directory.
+After the first copy, starts observing.  And copy the files when every changes.
 
-Class `cpx.Cpx`
+Arguments is same as `cpx.copy`.
 
-`cpx.Cpx` is `EventEmitter`.
+`cpx.watch` returns an `EventEmitter`.
 
 - `.on("copy", (e) => { ... })` : Be fired after file is copied. `e.srcPath` is a path of original file. `e.dstPath` is a path of new file.
 - `.on("remove", (e) => { ... })` : Be fired after file is removed. `e.path` is a path of removed file.
