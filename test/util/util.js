@@ -7,11 +7,11 @@ export function setupTestDir(dataset) {
   for (let path in dataset) {
     writeFile(path, dataset[path]);
   }
-};
+}
 
 export function teardownTestDir(testRootPath) {
   rimraf(testRootPath);
-};
+}
 
 export function content(path) {
   try {
@@ -20,13 +20,13 @@ export function content(path) {
   catch (err) {
     return null;
   }
-};
+}
 
-export function writeFile(path, content) {
+export function writeFile(path, contentText) {
   mkdir(dirname(path));
-  writeFileSync(path, content);
-};
+  writeFileSync(path, contentText);
+}
 
 export function removeFile(path) {
   rimraf(path);
-};
+}
