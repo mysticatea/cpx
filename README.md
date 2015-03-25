@@ -52,6 +52,8 @@ This example will copy html/png/jpg files from `src` directory to `app`
 directory, keeping file tree structure.
 Whenever the files are changed, copy them.
 
+> Since Bash expands globs, requires to enclose it with double quotes.
+
 You can use together [Browserify](http://browserify.org).
 
 ```
