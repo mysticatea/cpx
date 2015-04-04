@@ -6,7 +6,7 @@ import {Minimatch} from "minimatch";
 import {Glob, sync as searchSync} from "glob";
 import getBasePath from "glob2base";
 import {watch as createWatcher} from "chokidar";
-import {copy, copySync} from "./copy";
+import * as cp from "./copy";
 import {assert, assertType, assertTypeOpt} from "./utils";
 import Queue from "./queue";
 
@@ -76,6 +76,7 @@ export default class Cpx extends EventEmitter {
   constructor(source, outDir, options) {
     assertType(source, "source", "string");
     assertType(outDir, "outDir", "string");
+    super();
 
     const transforms = [].concat(options && options.transform).filter(Boolean);
     transforms.forEach(t => assertType(t, "transform", "function"));
@@ -156,7 +157,7 @@ export default class Cpx extends EventEmitter {
       mkdir(dirname(dstPath), next);
     });
     this[QUEUE].push(next => {
-      copy(srcPath, dstPath, this.transformFactories, err => {
+      cp.copy(srcPath, dstPath, this.transformFactories, err => {
         if (err == null) {
           this.emit("copy", {srcPath, dstPath});
         }
@@ -277,7 +278,7 @@ export default class Cpx extends EventEmitter {
       }
 
       mkdirSync(dirname(dstPath));
-      copySync(srcPath, dstPath);
+      cp.copySync(srcPath, dstPath);
 
       this.emit("copy", {srcPath, dstPath});
     });

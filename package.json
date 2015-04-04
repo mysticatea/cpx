@@ -10,13 +10,15 @@
     "lib"
   ],
   "scripts": {
-    "build": "babel src --out-dir lib",
-    "test": "npm-run-all test:lint build test:mocha",
-    "test:lint": "eslint src test",
+    "clean": "rimraf lib",
+    "lint": "eslint src",
+    "build": "npm-run-all clean lint build:lib",
+    "build:lib": "babel src --out-dir lib",
+    "test": "npm-run-all build test:mocha",
     "test:mocha": "mocha test/*.js --compilers js:babel/register --timeout 5000 --colors",
-    "testing": "npm-run-all --parallel testing:build testing:mocha",
-    "testing:build": "npm run build -- --watch --source-maps-inline",
-    "testing:mocha": "npm run test:mocha -- --watch"
+    "testing": "npm-run-all clean --parallel testing:build testing:mocha",
+    "testing:build": "npm run build:lib -- --watch --source-maps-inline",
+    "testing:mocha": "npm run test:mocha -- --watch --growl"
   },
   "repository": {
     "type": "git",
@@ -45,16 +47,16 @@
   },
   "homepage": "https://github.com/mysticatea/cpx",
   "devDependencies": {
-    "babel": "^4.7.15",
-    "chai": "^2.1.2",
-    "eslint": "^0.17.1",
+    "babel": "^5.0.8",
+    "chai": "^2.2.0",
+    "eslint": "^0.18.0",
     "mocha": "^2.2.1",
-    "npm-run-all": "^1.0.2",
+    "npm-run-all": "^1.1.1",
     "rimraf": "^2.3.2",
     "through": "^2.3.6"
   },
   "dependencies": {
-    "chokidar": "^1.0.0-rc4",
+    "chokidar": "^1.0.0-rc5",
     "duplexer": "^0.1.1",
     "glob": "^5.0.3",
     "glob2base": "0.0.12",
