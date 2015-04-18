@@ -16,7 +16,7 @@
     "build:lib": "babel src --out-dir lib",
     "test": "npm-run-all build test:mocha",
     "test:mocha": "mocha test/*.js --compilers js:babel/register --timeout 5000 --colors",
-    "testing": "npm-run-all clean --parallel testing:build testing:mocha",
+    "testing": "npm-run-all clean --parallel testing:*",
     "testing:build": "npm run build:lib -- --watch --source-maps-inline",
     "testing:mocha": "npm run test:mocha -- --watch --growl"
   },
