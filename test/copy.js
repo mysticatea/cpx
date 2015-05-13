@@ -1,10 +1,13 @@
-import {execSync} from "child_process";
+import * as child_process from "child_process";
+import {exec} from "shelljs";
 import {expect} from "chai";
 import * as cpx from "../lib/index";
 import {setupTestDir,
         teardownTestDir,
         content} from "./util/util";
 import upperify from "./util/upperify";
+
+const execSync = child_process.execSync || exec;
 
 describe("The copy method", () => {
 
