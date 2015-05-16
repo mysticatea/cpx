@@ -13,7 +13,7 @@
     "clean": "rimraf lib",
     "lint": "eslint src",
     "build": "npm-run-all clean lint build:lib",
-    "build:lib": "babel src --out-dir lib",
+    "build:lib": "babel --optional runtime src --out-dir lib",
     "test": "npm-run-all build test:mocha",
     "test:mocha": "mocha test/*.js --compilers js:babel/register --timeout 5000 --colors",
     "testing": "npm-run-all clean --parallel testing:*",
@@ -56,6 +56,7 @@
     "through": "^2.3.7"
   },
   "dependencies": {
+    "babel-runtime": "^5.3.1",
     "chokidar": "^1.0.1",
     "duplexer": "^0.1.1",
     "glob": "^5.0.6",
@@ -64,6 +65,7 @@
     "mkdirp": "^0.5.1",
     "resolve": "^1.1.6",
     "shell-quote": "^1.4.3",
+    "shelljs": "^0.4.0",
     "subarg": "^1.0.0"
   }
 }
