@@ -49,7 +49,7 @@
   "devDependencies": {
     "babel": "^5.4.2",
     "chai": "^2.3.0",
-    "eslint": "^0.21.0",
+    "eslint": "0.21.0",
     "mocha": "^2.2.5",
     "npm-run-all": "^1.2.5",
     "rimraf": "^2.3.3",
