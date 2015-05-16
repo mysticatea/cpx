@@ -53,6 +53,7 @@
     "mocha": "^2.2.5",
     "npm-run-all": "^1.2.5",
     "rimraf": "^2.3.3",
+    "shelljs": "^0.4.0",
     "through": "^2.3.7"
   },
   "dependencies": {
@@ -65,7 +66,6 @@
     "mkdirp": "^0.5.1",
     "resolve": "^1.1.6",
     "shell-quote": "^1.4.3",
-    "shelljs": "^0.4.0",
     "subarg": "^1.0.0"
   }
 }
