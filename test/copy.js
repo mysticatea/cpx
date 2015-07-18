@@ -186,4 +186,39 @@ describe("The copy method", () => {
 
   });
 
+  describe("should copy as expected even if the path does not included with `/`.", () => {
+    beforeEach(() => {
+      setupTestDir({
+        "hello.txt": "Hello"
+      });
+    });
+    afterEach(() => {
+      teardownTestDir("hello.txt");
+      teardownTestDir("test-ws");
+    });
+
+    function verifyFiles() {
+      expect(content("test-ws/hello.txt")).to.equal("Hello");
+    }
+
+    it("lib async version.", done => {
+      cpx.copy("hello.txt", "test-ws", err => {
+        expect(err).to.be.null;
+        verifyFiles();
+        done();
+      });
+    });
+
+    it("lib sync version.", () => {
+      cpx.copySync("hello.txt", "test-ws");
+      verifyFiles();
+    });
+
+    it("command version.", () => {
+      execSync("node lib/command.js hello.txt test-ws");
+      verifyFiles();
+    });
+
+  });
+
 });

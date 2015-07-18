@@ -1,5 +1,5 @@
 import {EventEmitter} from "events";
-import {dirname} from "path";
+import {dirname, join as joinPath} from "path";
 import {unlink, unlinkSync, rmdir, rmdirSync} from "fs";
 import mkdir, {sync as mkdirSync} from "mkdirp";
 import {Minimatch} from "minimatch";
@@ -133,6 +133,9 @@ export default class Cpx extends EventEmitter {
    */
   src2dst(path) {
     assertType(path, "path", "string");
+    if (this.base === ".") {
+      return joinPath(this.outDir, path);
+    }
     return path.replace(this.base, this.outDir);
   }
 
