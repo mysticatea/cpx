@@ -8,7 +8,12 @@
 
 const {EventEmitter} = require("events");
 const {unlink, unlinkSync, rmdir, rmdirSync} = require("fs");
-const {dirname, join: joinPath} = require("path");
+const {
+    dirname,
+    resolve: resolvePath,
+    relative: relativePath,
+    join: joinPath
+} = require("path");
 const assert = require("assert");
 const {watch: createWatcher} = require("chokidar");
 const {Glob, sync: searchSync} = require("glob");
@@ -39,11 +44,12 @@ function normalizePath(path) {
         return null;
     }
 
-    const normalizedPath = path.replace(/\\/g, "/").trim();
+    let normalizedPath = relativePath(process.cwd(), resolvePath(path));
+    normalizedPath = normalizedPath.replace(/\\/g, "/");
     if (/\/$/.test(normalizedPath)) {
-        return normalizedPath.slice(0, -1);
+        normalizedPath = normalizedPath.slice(0, -1);
     }
-    return normalizedPath;
+    return normalizedPath || ".";
 }
 
 /**

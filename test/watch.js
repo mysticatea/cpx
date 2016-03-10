@@ -166,6 +166,52 @@ describe("The watch method", () => {
         });
     });
 
+    describe("should copy specified files with globs at first even if the glob starts with `./`:", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/untachable.txt": "untachable",
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/b/this-is.txt": "A pen",
+                "test-ws/a/b/that-is.txt": "A note",
+                "test-ws/a/b/no-copy.dat": "no-copy"
+            });
+        });
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/untachable.txt") === "untachable");
+            assert(content("test-ws/a/hello.txt") === "Hello");
+            assert(content("test-ws/a/b/this-is.txt") === "A pen");
+            assert(content("test-ws/a/b/that-is.txt") === "A note");
+            assert(content("test-ws/a/b/no-copy.dat") === "no-copy");
+            assert(content("test-ws/b/untachable.txt") === null);
+            assert(content("test-ws/b/hello.txt") === "Hello");
+            assert(content("test-ws/b/b/this-is.txt") === "A pen");
+            assert(content("test-ws/b/b/that-is.txt") === "A note");
+            assert(content("test-ws/b/b/no-copy.dat") === null);
+        }
+
+        it("lib version.", (done) => {
+            watcher = cpx.watch("./test-ws/a/**/*.txt", "test-ws/b");
+            watcher.on("watch-ready", () => {
+                // Done the first copies.
+                verifyFiles();
+                done();
+            });
+        });
+
+        it("command version.", (done) => {
+            command = execCommand("\"./test-ws/a/**/*.txt\" test-ws/b --watch --verbose");
+            waitForReady(() => {
+                verifyFiles();
+                done();
+            });
+        });
+    });
+
     describe("should clean and copy specified file blobs at first when give clean option:", () => {
         beforeEach(() => {
             setupTestDir({
