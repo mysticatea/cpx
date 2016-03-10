@@ -87,7 +87,11 @@ module.exports = function main(source, outDir, args) {
 
     //--------------------------------------------------------------------------
     // Main.
-    const cpx = new Cpx(source, outDir, {transform: mergedTransformFactories});
+    const cpx = new Cpx(
+        source,
+        outDir,
+        {transform: mergedTransformFactories, dereference: args.dereference}
+    );
     if (args.verbose) {
         cpx.on("copy", (event) => {
             console.log(`Copied: ${event.srcPath} --> ${event.dstPath}`);

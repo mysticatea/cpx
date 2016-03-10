@@ -22,25 +22,24 @@ npm install cpx
 ```
 Usage: cpx <source> <dest> [options]
 
-  Copy file globs, watching for changes.
+    Copy files, watching for changes.
 
-    <source>  A file glob of target files.
-              e.g. src/**/*.{html,png,jpg}
-    <dest>    A path of destination directory.
-              e.g. app
+        <source>  The glob of target files.
+        <dest>    The path of a destination directory.
 
 Options:
 
-  -c, --command <command>   A command text to transform each file.
-  -C, --clean               Clean files that matches <source> like pattern in
-                            <dest> directory before the first copying.
-  -h, --help                Print usage information
-  -t, --transform <name>    A module name to transform each file. cpx lookups
-                            the specified name via "require()".
-  -v, --verbose             Print copied/removed files.
-  -V, --version             Print the version number
-  -w, --watch               Watch for files that matches <source>, and copy the
-                            file to <dest> every changing.
+    -c, --command <command>   A command text to transform each file.
+    -C, --clean               Clean files that matches <source> like pattern in
+                              <dest> directory before the first copying.
+    -L, --dereference         Follow symbolic links when copying from them.
+    -h, --help                Print usage information
+    -t, --transform <name>    A module name to transform each file. cpx lookups
+                                the specified name via "require()".
+    -v, --verbose             Print copied/removed files.
+    -V, --version             Print the version number
+    -w, --watch               Watch for files that matches <source>, and copy
+                              the file to <dest> every changing.
 ```
 
 
@@ -96,6 +95,7 @@ cpx.copy(source, dest, callback)
 - **dest** `{string}` -- A file path of a destination directory.
 - **options** `{object}`
   - **options.clean** `{boolean}` -- A flag to remove files that copied on past before copy.
+  - **options.dereference** `{boolean}` -- A flag to follow symbolic links when copying from them.
   - **options.transform** `{((filepath: string) => stream.Transform)[]}` -- Functions that creates a `stream.Transform` object to transform each copying file.
 - **callback** `{(err: Error|null) => void}` -- A function that is called at done.
 
