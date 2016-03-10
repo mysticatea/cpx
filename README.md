@@ -1,7 +1,9 @@
-# cpx 
+# cpx
 
+[![npm version](https://img.shields.io/npm/v/cpx.svg)](https://www.npmjs.com/package/cpx)
+[![Downloads/month](https://img.shields.io/npm/dm/cpx.svg)](https://www.npmjs.com/package/cpx)
 [![Build Status](https://travis-ci.org/mysticatea/cpx.svg?branch=master)](https://travis-ci.org/mysticatea/cpx)
-[![npm version](https://badge.fury.io/js/cpx.svg)](http://badge.fury.io/js/cpx)
+[![Dependency Status](https://david-dm.org/mysticatea/cpx.svg)](https://david-dm.org/mysticatea/cpx)
 
 Copy file globs, watching for changes.
 
