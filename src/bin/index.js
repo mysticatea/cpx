@@ -17,13 +17,14 @@ const OPTIONS = {
     c: "command",
     C: "clean",
     h: "help",
+    L: "dereference",
     t: "transform",
     v: "verbose",
     V: "version",
     w: "watch"
 };
 const args = subarg(process.argv.slice(2), {
-    boolean: ["clean", "help", "verbose", "version", "watch"],
+    boolean: ["clean", "dereference", "help", "verbose", "version", "watch"],
     alias: OPTIONS
 });
 const source = args._[0];

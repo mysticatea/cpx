@@ -18,6 +18,8 @@ exports.Cpx = Cpx;
  * @param {object} [options = null] - Omittable. An option object.
  * @param {boolean} [options.clean = false] - A flag to remove files that have
  *      been copied previously before copy.
+ * @param {boolean} [options.dereference = false] - A flag to follow symbolic
+ *      links.
  * @param {function[]} [options.transform = null] - Functions to make transform
  *      streams for each file.
  * @param {function} [cb = null] - A callback function to be called after done.
@@ -57,6 +59,8 @@ exports.copy = function copy(source, outDir, options = null, cb = null) {
  * @param {object} [options = null] - Omittable. An option object.
  * @param {boolean} [options.clean = false] - A flag to remove files that have
  *      been copied previously before copy.
+ * @param {boolean} [options.dereference = false] - A flag to follow symbolic
+ *      links.
  * @returns {Cpx} A Cpx instance.
  */
 exports.copySync = function copySync(source, outDir, options = null) {
@@ -76,6 +80,8 @@ exports.copySync = function copySync(source, outDir, options = null) {
  * @param {object} [options = null] - Omittable. An option object.
  * @param {boolean} [options.clean = false] - A flag to remove files that have
  *      been copied previously before copy.
+ * @param {boolean} [options.dereference = false] - A flag to follow symbolic
+ *      links.
  * @returns {Cpx} A Cpx instance.
  */
 exports.watch = function watch(source, outDir, options = null) {

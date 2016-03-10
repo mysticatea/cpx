@@ -26,6 +26,7 @@ const copyFileSync = require("./copy-sync");
 const Queue = require("./queue");
 
 const BASE_DIR = Symbol("baseDir");
+const DEREFERENCE = Symbol("dereference");
 const OUT_DIR = Symbol("outDir");
 const SOURCE = Symbol("source");
 const TRANSFORM = Symbol("transform");
@@ -95,7 +96,7 @@ function doAll(cpx, pattern, action, cb) {
         }
     }
 
-    new Glob(pattern, {nodir: true, silent: true})
+    new Glob(pattern, {nodir: true, silent: true, follow: cpx.dereference})
         .on("match", (path) => {
             if (lastError != null) { return; }
 
@@ -124,14 +125,14 @@ module.exports = class Cpx extends EventEmitter {
     constructor(source, outDir, options) {
         assert(typeof source === "string");
         assert(typeof outDir === "string");
-        super();
+        options = options || {}; // eslint-disable-line no-param-reassign
 
-        const transforms =
-            [].concat(options && options.transform).filter(Boolean);
+        super();
 
         this[SOURCE] = normalizePath(source);
         this[OUT_DIR] = normalizePath(outDir);
-        this[TRANSFORM] = transforms;
+        this[DEREFERENCE] = Boolean(options.dereference);
+        this[TRANSFORM] = [].concat(options.transform).filter(Boolean);
         this[QUEUE] = new Queue();
         this[BASE_DIR] = null;
         this[WATCHER] = null;
@@ -155,6 +156,14 @@ module.exports = class Cpx extends EventEmitter {
      */
     get outDir() {
         return this[OUT_DIR];
+    }
+
+    /**
+     * The flag to follow symbolic links.
+     * @type {boolean}
+     */
+    get dereference() {
+        return this[DEREFERENCE];
     }
 
     /**
@@ -336,8 +345,11 @@ module.exports = class Cpx extends EventEmitter {
             throw new Error("Synchronous copy can't use the transform option.");
         }
 
-        const srcpaths = searchSync(this.source, {nodir: true, silent: true});
-        srcpaths.forEach(srcPath => {
+        const srcPaths = searchSync(
+            this.source,
+            {nodir: true, silent: true, follow: this.dereference}
+        );
+        srcPaths.forEach(srcPath => {
             const dstPath = this.src2dst(srcPath);
             if (dstPath === srcPath) {
                 return;
@@ -375,45 +387,52 @@ module.exports = class Cpx extends EventEmitter {
             }
         };
 
-        this[WATCHER] =
-            createWatcher(this.base, {cwd: process.cwd(), persistent: true})
-                .on("add", (path) => {
-                    const normalizedPath = normalizePath(path);
-                    if (m.match(normalizedPath)) {
-                        if (ready) {
-                            this.enqueueCopy(normalizedPath);
-                        }
-                        else {
-                            firstCopyCount += 1;
-                            this.enqueueCopy(normalizedPath, () => {
-                                firstCopyCount -= 1;
-                                fireReadyIfReady();
-                            });
-                        }
-                    }
-                })
-                .on("unlink", (path) => {
-                    const normalizedPath = normalizePath(path);
-                    if (m.match(normalizedPath)) {
-                        const dstPath = this.src2dst(normalizedPath);
-                        if (dstPath !== normalizedPath) {
-                            this.enqueueRemove(dstPath);
-                        }
-                    }
-                })
-                .on("change", (path) => {
-                    const normalizedPath = normalizePath(path);
-                    if (m.match(normalizedPath)) {
+        this[WATCHER] = createWatcher(
+            this.base,
+            {
+                cwd: process.cwd(),
+                persistent: true,
+                followSymlinks: this.dereference
+            }
+        );
+        this[WATCHER]
+            .on("add", (path) => {
+                const normalizedPath = normalizePath(path);
+                if (m.match(normalizedPath)) {
+                    if (ready) {
                         this.enqueueCopy(normalizedPath);
                     }
-                })
-                .on("ready", () => {
-                    ready = true;
-                    fireReadyIfReady();
-                })
-                .on("error", (err) => {
-                    this.emit("watch-error", err);
-                });
+                    else {
+                        firstCopyCount += 1;
+                        this.enqueueCopy(normalizedPath, () => {
+                            firstCopyCount -= 1;
+                            fireReadyIfReady();
+                        });
+                    }
+                }
+            })
+            .on("unlink", (path) => {
+                const normalizedPath = normalizePath(path);
+                if (m.match(normalizedPath)) {
+                    const dstPath = this.src2dst(normalizedPath);
+                    if (dstPath !== normalizedPath) {
+                        this.enqueueRemove(dstPath);
+                    }
+                }
+            })
+            .on("change", (path) => {
+                const normalizedPath = normalizePath(path);
+                if (m.match(normalizedPath)) {
+                    this.enqueueCopy(normalizedPath);
+                }
+            })
+            .on("ready", () => {
+                ready = true;
+                fireReadyIfReady();
+            })
+            .on("error", (err) => {
+                this.emit("watch-error", err);
+            });
     }
 
     /**

@@ -16,23 +16,24 @@ module.exports = function help() {
     console.log(`
 Usage: cpx <source> <dest> [options]
 
-    Copy file globs, watching for changes.
+    Copy files, watching for changes.
 
-        <source>  The file glob of target files.
+        <source>  The glob of target files.
         <dest>    The path of a destination directory.
 
 Options:
 
-  -c, --command <command>   A command text to transform each file.
-  -C, --clean               Clean files that matches <source> like pattern in
-                            <dest> directory before the first copying.
-  -h, --help                Print usage information
-  -t, --transform <name>    A module name to transform each file. cpx lookups
-                            the specified name via "require()".
-  -v, --verbose             Print copied/removed files.
-  -V, --version             Print the version number
-  -w, --watch               Watch for files that matches <source>, and copy the
-                            file to <dest> every changing.
+    -c, --command <command>   A command text to transform each file.
+    -C, --clean               Clean files that matches <source> like pattern in
+                              <dest> directory before the first copying.
+    -L, --dereference         Follow symbolic links when copying from them.
+    -h, --help                Print usage information
+    -t, --transform <name>    A module name to transform each file. cpx lookups
+                                the specified name via "require()".
+    -v, --verbose             Print copied/removed files.
+    -V, --version             Print the version number
+    -w, --watch               Watch for files that matches <source>, and copy
+                              the file to <dest> every changing.
 
 Examples:
 
@@ -40,6 +41,6 @@ Examples:
     cpx "src/**/*.css" app --watch --verbose
 
 See Also:
-  https://github.com/mysticatea/cpx
+    https://github.com/mysticatea/cpx
 `);
 };

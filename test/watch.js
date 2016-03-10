@@ -6,6 +6,8 @@
 
 "use strict";
 
+const {symlinkSync} = require("fs");
+const {resolve: resolvePath} = require("path");
 const assert = require("power-assert");
 const cpx = require("../src/lib");
 const {
@@ -159,6 +161,48 @@ describe("The watch method", () => {
 
         it("command version.", (done) => {
             command = execCommand("\"test-ws/a/**/*.txt\" test-ws/b --watch --verbose");
+            waitForReady(() => {
+                verifyFiles();
+                done();
+            });
+        });
+    });
+
+    describe("should copy files in symlink directory at first when `--dereference` option was given:", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/src/a/hello.txt": "Symlinked",
+                "test-ws/a/hello.txt": "Hello"
+            });
+            symlinkSync(
+                resolvePath("test-ws/src"),
+                resolvePath("test-ws/a/link"),
+                "junction"
+            );
+        });
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/a/hello.txt") === "Hello");
+            assert(content("test-ws/a/link/a/hello.txt") === "Symlinked");
+            assert(content("test-ws/b/hello.txt") === "Hello");
+            assert(content("test-ws/b/link/a/hello.txt") === "Symlinked");
+        }
+
+        it("lib version.", (done) => {
+            watcher = cpx.watch("test-ws/a/**/*.txt", "test-ws/b", {dereference: true});
+            watcher.on("watch-ready", () => {
+                // Done the first copies.
+                verifyFiles();
+                done();
+            });
+        });
+
+        it("command version.", (done) => {
+            command = execCommand("\"test-ws/a/**/*.txt\" test-ws/b --watch --dereference --verbose");
             waitForReady(() => {
                 verifyFiles();
                 done();

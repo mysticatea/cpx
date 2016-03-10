@@ -6,6 +6,8 @@
 
 "use strict";
 
+const {symlinkSync} = require("fs");
+const {resolve: resolvePath} = require("path");
 const assert = require("power-assert");
 const cpx = require("../src/lib");
 const {
@@ -117,6 +119,52 @@ describe("The copy method", () => {
 
         it("command version.", () => {
             execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --clean");
+            verifyFiles();
+        });
+    });
+
+    describe("should copy files inside of symlink directory when `--dereference` option was specified:", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/src/a/hello.txt": "Symlinked",
+                "test-ws/a/hello.txt": "Hello"
+            });
+            symlinkSync(
+                resolvePath("test-ws/src"),
+                resolvePath("test-ws/a/link"),
+                "junction"
+            );
+        });
+        afterEach(() => {
+            teardownTestDir("test-ws");
+        });
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/a/hello.txt") === "Hello");
+            assert(content("test-ws/a/link/a/hello.txt") === "Symlinked");
+            assert(content("test-ws/b/hello.txt") === "Hello");
+            assert(content("test-ws/b/link/a/hello.txt") === "Symlinked");
+        }
+
+        it("lib async version.", (done) => {
+            cpx.copy("test-ws/a/**/*.txt", "test-ws/b", {dereference: true}, (err) => {
+                assert(err === null);
+                verifyFiles();
+                done();
+            });
+        });
+
+        it("lib sync version.", () => {
+            cpx.copySync("test-ws/a/**/*.txt", "test-ws/b", {dereference: true});
+            verifyFiles();
+        });
+
+        it("command version.", () => {
+            execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --dereference");
             verifyFiles();
         });
     });
