@@ -1,24 +1,44 @@
-/*eslint no-process-exit:0*/
+/**
+ * @author Toru Nagashima
+ * @copyright 2016 Toru Nagashima. All rights reserved.
+ * See LICENSE file in root directory for full license.
+ */
+/* eslint-disable no-var */
+
+"use strict";
+
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
+
 var through = require("through");
 
-var toUpperCase = module.exports = function toUpperCase() {
-  var buffer = new Buffer(0);
-  return through(
-    function write(data) {
-      if (typeof data === "string") {
-        data = new Buffer(data);
-      }
-      buffer = Buffer.concat([buffer, data]);
-    },
-    function end() {
-      if (buffer.length > 0) {
-        this.queue(buffer.toString().toUpperCase());
-      }
-      this.queue(null);
-    }
-  );
-};
+//------------------------------------------------------------------------------
+// Helpers
+//------------------------------------------------------------------------------
+
+/**
+ * Creates a transform stream to convert data to upper cases.
+ * @returns {stream.Transform} A transform stream to convert data to upper cases.
+ */
+function toUpperCase() {
+    return through(
+        /* @this stream.Transform */ function write(chunk) {
+            this.queue(chunk.toString().toUpperCase());
+        },
+        /* @this stream.Transform */ function end() {
+            this.queue(null);
+        }
+    );
+}
+
+//------------------------------------------------------------------------------
+// Main
+//------------------------------------------------------------------------------
 
 if (require.main === module) {
-  process.stdin.pipe(toUpperCase()).pipe(process.stdout);
+    process.stdin.pipe(toUpperCase()).pipe(process.stdout);
+}
+else {
+    module.exports = toUpperCase;
 }

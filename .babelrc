@@ -1,0 +1,14 @@
+{
+    "env": {
+        "production": {
+            "presets": ["es2015"],
+            "plugins": ["transform-runtime", "unassert"],
+            "sourceMaps": false
+        },
+        "development": {
+            "presets": ["es2015"],
+            "plugins": ["transform-runtime", "espower"],
+            "sourceMaps": "inline"
+        }
+    }
+}

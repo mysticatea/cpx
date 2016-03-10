@@ -1,3 +1,4 @@
-/node_modules
+/bin
 /lib
 /npm-debug.log
+/node_modules

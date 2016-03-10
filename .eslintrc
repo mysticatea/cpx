@@ -1,0 +1,13 @@
+{
+    "extends": ["mysticatea", "mysticatea/node"],
+    "rules": {
+        "no-param-reassign": [2, {"props": false}]
+    },
+    "settings": {
+        "node": {
+            "convertPath": {
+                "src/**/*.js": ["^src/(.+?)$", "$1"]
+            }
+        }
+    }
+}
