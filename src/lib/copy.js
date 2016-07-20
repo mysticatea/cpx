@@ -30,7 +30,9 @@ module.exports = function copy(src, dst, transformFactories, cb) {
         try {
             streams.forEach(s => {
                 s.removeListener("error", done);
-                s.destroy();
+                if (typeof s.destroy === "function") {
+                    s.destroy();
+                }
             });
             writer.removeListener("error", done);
             writer.removeListener("finish", done);

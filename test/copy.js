@@ -17,6 +17,7 @@ const {
     execCommandSync
 } = require("./util/util");
 const upperify = require("./util/upperify");
+const upperify2 = require("./util/upperify2");
 
 describe("The copy method", () => {
     describe("should copy specified files with globs:", () => {
@@ -193,6 +194,30 @@ describe("The copy method", () => {
         });
     });
 
+    describe("should copy with transforming when `--command` option was specified (it does not have 'destroy' method).", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/a/hello.txt": "Hello"
+            });
+        });
+        afterEach(() => {
+            teardownTestDir("test-ws");
+        });
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/b/hello.txt") === "HELLO");
+        }
+
+        it("command version.", () => {
+            execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --command \"node ./test/util/upperify2.js\"");
+            verifyFiles();
+        });
+    });
+
     describe("should copy with transforming when `--transform` option was specified.", () => {
         beforeEach(() => {
             setupTestDir({
@@ -227,6 +252,44 @@ describe("The copy method", () => {
 
         it("command version.", () => {
             execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --transform ./test/util/upperify");
+            verifyFiles();
+        });
+    });
+
+    describe("should copy with transforming when `--transform` option was specified (it does not have 'destroy' method).", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/a/hello.txt": "Hello"
+            });
+        });
+        afterEach(() => {
+            teardownTestDir("test-ws");
+        });
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/b/hello.txt") === "HELLO");
+        }
+
+        it("lib async version.", (done) => {
+            cpx.copy("test-ws/a/**/*.txt", "test-ws/b", {transform: upperify2}, (err) => {
+                assert(err === null);
+                verifyFiles();
+                done();
+            });
+        });
+
+        it("should throw an error on lib sync version (cannot use streaming api).", () => {
+            assert.throws(() => {
+                cpx.copySync("test-ws/a/**/*.txt", "test-ws/b", {transform: upperify2});
+            }, Error);
+        });
+
+        it("command version.", () => {
+            execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --transform ./test/util/upperify2");
             verifyFiles();
         });
     });
