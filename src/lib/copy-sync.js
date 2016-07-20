@@ -4,11 +4,11 @@
  * See LICENSE file in root directory for full license.
  */
 
-"use strict";
+"use strict"
 
-const Buffer = require("buffer").Buffer;
-const {openSync, closeSync, readSync, writeSync} = require("fs");
-const MAX_BUFFER = 2048;
+const {Buffer} = require("safe-buffer")
+const {openSync, closeSync, readSync, writeSync} = require("fs")
+const MAX_BUFFER = 2048
 
 /**
  * @param {string} src - A path of the source file.
@@ -17,25 +17,25 @@ const MAX_BUFFER = 2048;
  * @private
  */
 module.exports = function copySync(src, dst) {
-    const buffer = new Buffer(MAX_BUFFER);
-    let bytesRead = MAX_BUFFER;
-    let pos = 0;
+    const buffer = Buffer.allocUnsafe(MAX_BUFFER)
+    let bytesRead = MAX_BUFFER
+    let pos = 0
 
-    const input = openSync(src, "r");
+    const input = openSync(src, "r")
     try {
-        const output = openSync(dst, "w");
+        const output = openSync(dst, "w")
         try {
             while (MAX_BUFFER === bytesRead) {
-                bytesRead = readSync(input, buffer, 0, MAX_BUFFER, pos);
-                writeSync(output, buffer, 0, bytesRead);
-                pos += bytesRead;
+                bytesRead = readSync(input, buffer, 0, MAX_BUFFER, pos)
+                writeSync(output, buffer, 0, bytesRead)
+                pos += bytesRead
             }
         }
         finally {
-            closeSync(output);
+            closeSync(output)
         }
     }
     finally {
-        closeSync(input);
+        closeSync(input)
     }
-};
+}

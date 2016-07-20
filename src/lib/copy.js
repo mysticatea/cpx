@@ -4,9 +4,9 @@
  * See LICENSE file in root directory for full license.
  */
 
-"use strict";
+"use strict"
 
-const {createReadStream, createWriteStream} = require("fs");
+const {createReadStream, createWriteStream} = require("fs")
 
 /**
  * @param {string} src - A path of the source file.
@@ -17,9 +17,9 @@ const {createReadStream, createWriteStream} = require("fs");
  * @private
  */
 module.exports = function copy(src, dst, transformFactories, cb) {
-    const reader = createReadStream(src);
-    const writer = createWriteStream(dst);
-    const streams = [reader];
+    const reader = createReadStream(src)
+    const writer = createWriteStream(dst)
+    const streams = [reader]
 
     /**
      * Clean up.
@@ -29,38 +29,38 @@ module.exports = function copy(src, dst, transformFactories, cb) {
     function done(err) {
         try {
             streams.forEach(s => {
-                s.removeListener("error", done);
+                s.removeListener("error", done)
                 if (typeof s.destroy === "function") {
-                    s.destroy();
+                    s.destroy()
                 }
-            });
-            writer.removeListener("error", done);
-            writer.removeListener("finish", done);
+            })
+            writer.removeListener("error", done)
+            writer.removeListener("finish", done)
         }
         catch (cleanupErr) {
-            cb(err || cleanupErr);
-            return;
+            cb(err || cleanupErr)
+            return
         }
 
-        cb(err);
+        cb(err)
     }
 
-    reader.on("error", done);
-    writer.on("error", done);
-    writer.on("finish", done);
+    reader.on("error", done)
+    writer.on("error", done)
+    writer.on("finish", done)
 
     try {
         transformFactories
             .reduce((input, factory) => {
-                const t = factory(src);
-                t.on("error", done);
-                streams.push(t);
+                const t = factory(src)
+                t.on("error", done)
+                streams.push(t)
 
-                return input.pipe(t);
+                return input.pipe(t)
             }, reader)
-            .pipe(writer);
+            .pipe(writer)
     }
     catch (err) {
-        done(err);
+        done(err)
     }
-};
+}

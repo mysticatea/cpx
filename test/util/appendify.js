@@ -5,19 +5,19 @@
  */
 /* eslint-disable no-var */
 
-"use strict";
+"use strict"
 
 //------------------------------------------------------------------------------
 // Requirements
 //------------------------------------------------------------------------------
 
-var through = require("through");
+var through = require("through")
 
 //------------------------------------------------------------------------------
 // Helpers
 //------------------------------------------------------------------------------
 
-var postfix = process.argv[2] || "";
+var postfix = process.argv[2] || ""
 
 /**
  * Creates a transform stream to append the specific text.
@@ -28,16 +28,16 @@ var postfix = process.argv[2] || "";
 function append(filename, args) {
     return through(
         /* @this stream.Transform */ function write(chunk) {
-            this.queue(chunk);
+            this.queue(chunk)
         },
         /* @this stream.Transform */ function end() {
-            var value = (args && args._ && args._[0]) || postfix;
+            var value = (args && args._ && args._[0]) || postfix
             if (value) {
-                this.queue(value);
+                this.queue(value)
             }
-            this.queue(null);
+            this.queue(null)
         }
-    );
+    )
 }
 
 //------------------------------------------------------------------------------
@@ -45,8 +45,8 @@ function append(filename, args) {
 //------------------------------------------------------------------------------
 
 if (require.main === module) {
-    process.stdin.pipe(append()).pipe(process.stdout);
+    process.stdin.pipe(append()).pipe(process.stdout)
 }
 else {
-    module.exports = append;
+    module.exports = append
 }

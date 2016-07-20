@@ -1,7 +1,8 @@
 {
     "extends": ["mysticatea", "mysticatea/node"],
     "rules": {
-        "no-param-reassign": [2, {"props": false}]
+        "no-param-reassign": [2, {"props": false}],
+        "node/no-unsupported-features": "off"
     },
     "settings": {
         "node": {

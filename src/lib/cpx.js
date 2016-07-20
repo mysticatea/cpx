@@ -4,34 +4,34 @@
  * See LICENSE file in root directory for full license.
  */
 
-"use strict";
+"use strict"
 
-const {EventEmitter} = require("events");
-const {unlink, unlinkSync, rmdir, rmdirSync} = require("fs");
+const {EventEmitter} = require("events")
+const {unlink, unlinkSync, rmdir, rmdirSync} = require("fs")
 const {
     dirname,
     resolve: resolvePath,
     relative: relativePath,
-    join: joinPath
-} = require("path");
-const assert = require("assert");
-const {watch: createWatcher} = require("chokidar");
-const {Glob, sync: searchSync} = require("glob");
-const getBasePath = require("glob2base");
-const mkdir = require("mkdirp");
-const mkdirSync = mkdir.sync;
-const {Minimatch} = require("minimatch");
-const copyFile = require("./copy");
-const copyFileSync = require("./copy-sync");
-const Queue = require("./queue");
+    join: joinPath,
+} = require("path")
+const assert = require("assert")
+const {watch: createWatcher} = require("chokidar")
+const {Glob, sync: searchSync} = require("glob")
+const getBasePath = require("glob2base")
+const mkdir = require("mkdirp")
+const mkdirSync = mkdir.sync
+const {Minimatch} = require("minimatch")
+const copyFile = require("./copy")
+const copyFileSync = require("./copy-sync")
+const Queue = require("./queue")
 
-const BASE_DIR = Symbol("baseDir");
-const DEREFERENCE = Symbol("dereference");
-const OUT_DIR = Symbol("outDir");
-const SOURCE = Symbol("source");
-const TRANSFORM = Symbol("transform");
-const QUEUE = Symbol("queue");
-const WATCHER = Symbol("watcher");
+const BASE_DIR = Symbol("baseDir")
+const DEREFERENCE = Symbol("dereference")
+const OUT_DIR = Symbol("outDir")
+const SOURCE = Symbol("source")
+const TRANSFORM = Symbol("transform")
+const QUEUE = Symbol("queue")
+const WATCHER = Symbol("watcher")
 
 /**
  * Converts a file path to use glob.
@@ -42,15 +42,15 @@ const WATCHER = Symbol("watcher");
  */
 function normalizePath(path) {
     if (path == null) {
-        return null;
+        return null
     }
 
-    let normalizedPath = relativePath(process.cwd(), resolvePath(path));
-    normalizedPath = normalizedPath.replace(/\\/g, "/");
+    let normalizedPath = relativePath(process.cwd(), resolvePath(path))
+    normalizedPath = normalizedPath.replace(/\\/g, "/")
     if (/\/$/.test(normalizedPath)) {
-        normalizedPath = normalizedPath.slice(0, -1);
+        normalizedPath = normalizedPath.slice(0, -1)
     }
-    return normalizedPath || ".";
+    return normalizedPath || "."
 }
 
 /**
@@ -63,7 +63,7 @@ function normalizePath(path) {
  */
 function doAllSimply(cpx, pattern, action) {
     new Glob(pattern, {nodir: true, silent: true})
-        .on("match", action.bind(cpx));
+        .on("match", action.bind(cpx))
 }
 
 /**
@@ -78,13 +78,13 @@ function doAllSimply(cpx, pattern, action) {
  */
 function doAll(cpx, pattern, action, cb) {
     if (cb == null) {
-        doAllSimply(cpx, pattern, action);
-        return;
+        doAllSimply(cpx, pattern, action)
+        return
     }
 
-    let count = 0;
-    let done = false;
-    let lastError = null;
+    let count = 0
+    let done = false
+    let lastError = null
 
     /**
      * Calls the callback function if done.
@@ -92,28 +92,30 @@ function doAll(cpx, pattern, action, cb) {
      */
     function cbIfEnd() {
         if (done && count === 0) {
-            cb(lastError);
+            cb(lastError)
         }
     }
 
     new Glob(pattern, {nodir: true, silent: true, follow: cpx.dereference})
         .on("match", (path) => {
-            if (lastError != null) { return; }
+            if (lastError != null) {
+                return
+            }
 
-            count += 1;
+            count += 1
             action.call(cpx, path, (err) => {
-                count -= 1;
-                lastError = lastError || err;
-                cbIfEnd();
-            });
+                count -= 1
+                lastError = lastError || err
+                cbIfEnd()
+            })
         })
         .on("end", () => {
-            done = true;
-            cbIfEnd();
+            done = true
+            cbIfEnd()
         })
         .on("error", (err) => {
-            lastError = lastError || err;
-        });
+            lastError = lastError || err
+        })
 }
 
 module.exports = class Cpx extends EventEmitter {
@@ -123,19 +125,19 @@ module.exports = class Cpx extends EventEmitter {
      * @param {object} options - An options object.
      */
     constructor(source, outDir, options) {
-        assert(typeof source === "string");
-        assert(typeof outDir === "string");
-        options = options || {}; // eslint-disable-line no-param-reassign
+        assert(typeof source === "string")
+        assert(typeof outDir === "string")
+        options = options || {} // eslint-disable-line no-param-reassign
 
-        super();
+        super()
 
-        this[SOURCE] = normalizePath(source);
-        this[OUT_DIR] = normalizePath(outDir);
-        this[DEREFERENCE] = Boolean(options.dereference);
-        this[TRANSFORM] = [].concat(options.transform).filter(Boolean);
-        this[QUEUE] = new Queue();
-        this[BASE_DIR] = null;
-        this[WATCHER] = null;
+        this[SOURCE] = normalizePath(source)
+        this[OUT_DIR] = normalizePath(outDir)
+        this[DEREFERENCE] = Boolean(options.dereference)
+        this[TRANSFORM] = [].concat(options.transform).filter(Boolean)
+        this[QUEUE] = new Queue()
+        this[BASE_DIR] = null
+        this[WATCHER] = null
     }
 
     //==========================================================================
@@ -147,7 +149,7 @@ module.exports = class Cpx extends EventEmitter {
      * @type {string}
      */
     get source() {
-        return this[SOURCE];
+        return this[SOURCE]
     }
 
     /**
@@ -155,7 +157,7 @@ module.exports = class Cpx extends EventEmitter {
      * @type {string}
      */
     get outDir() {
-        return this[OUT_DIR];
+        return this[OUT_DIR]
     }
 
     /**
@@ -163,7 +165,7 @@ module.exports = class Cpx extends EventEmitter {
      * @type {boolean}
      */
     get dereference() {
-        return this[DEREFERENCE];
+        return this[DEREFERENCE]
     }
 
     /**
@@ -171,7 +173,7 @@ module.exports = class Cpx extends EventEmitter {
      * @type {function[]}
      */
     get transformFactories() {
-        return this[TRANSFORM];
+        return this[TRANSFORM]
     }
 
     /**
@@ -180,9 +182,9 @@ module.exports = class Cpx extends EventEmitter {
      */
     get base() {
         if (this[BASE_DIR] == null) {
-            this[BASE_DIR] = normalizePath(getBasePath(new Glob(this.source)));
+            this[BASE_DIR] = normalizePath(getBasePath(new Glob(this.source)))
         }
-        return this[BASE_DIR];
+        return this[BASE_DIR]
     }
 
     /**
@@ -192,12 +194,12 @@ module.exports = class Cpx extends EventEmitter {
      * @returns {string} The converted path.
      */
     src2dst(path) {
-        assert(typeof path === "string");
+        assert(typeof path === "string")
 
         if (this.base === ".") {
-            return joinPath(this.outDir, path);
+            return joinPath(this.outDir, path)
         }
-        return path.replace(this.base, this.outDir);
+        return path.replace(this.base, this.outDir)
     }
 
     /**
@@ -208,32 +210,32 @@ module.exports = class Cpx extends EventEmitter {
      * @returns {void}
      */
     enqueueCopy(srcPath, cb = null) {
-        assert(typeof srcPath === "string");
-        assert(cb == null || typeof cb === "function");
+        assert(typeof srcPath === "string")
+        assert(cb == null || typeof cb === "function")
 
-        const dstPath = this.src2dst(srcPath);
+        const dstPath = this.src2dst(srcPath)
         if (dstPath === srcPath) {
             if (cb != null) {
-                setImmediate(cb, null);
-                return;
+                setImmediate(cb, null)
+                return
             }
         }
 
         this[QUEUE].push(next => {
-            mkdir(dirname(dstPath), next);
-        });
+            mkdir(dirname(dstPath), next)
+        })
         this[QUEUE].push(next => {
             copyFile(srcPath, dstPath, this.transformFactories, (err) => {
                 if (err == null) {
-                    this.emit("copy", {srcPath, dstPath});
+                    this.emit("copy", {srcPath, dstPath})
                 }
 
-                next();
+                next()
                 if (cb != null) {
-                    cb(err || null);
+                    cb(err || null)
                 }
-            });
-        });
+            })
+        })
     }
 
     /**
@@ -244,28 +246,28 @@ module.exports = class Cpx extends EventEmitter {
      * @returns {void}
      */
     enqueueRemove(path, cb = null) {
-        assert(typeof path === "string");
-        assert(cb == null || typeof cb === "function");
+        assert(typeof path === "string")
+        assert(cb == null || typeof cb === "function")
 
-        let lastError = null;
+        let lastError = null
         this[QUEUE].push(next => {
             unlink(path, (err) => {
                 if (err == null) {
-                    this.emit("remove", {path});
+                    this.emit("remove", {path})
                 }
 
-                lastError = err;
-                next();
-            });
-        });
+                lastError = err
+                next()
+            })
+        })
         this[QUEUE].push(next => {
             rmdir(dirname(path), () => {
-                next();
+                next()
                 if (cb != null) {
-                    cb(lastError);
+                    cb(lastError)
                 }
-            });
-        });
+            })
+        })
     }
 
     //==========================================================================
@@ -279,17 +281,17 @@ module.exports = class Cpx extends EventEmitter {
      * @returns {void}
      */
     clean(cb = null) {
-        assert(cb == null || typeof cb === "function");
+        assert(cb == null || typeof cb === "function")
 
-        const dest = this.src2dst(this.source);
+        const dest = this.src2dst(this.source)
         if (dest === this.source) {
             if (cb != null) {
-                setImmediate(cb, null);
+                setImmediate(cb, null)
             }
-            return;
+            return
         }
 
-        doAll(this, dest, this.enqueueRemove, cb);
+        doAll(this, dest, this.enqueueRemove, cb)
     }
 
     /**
@@ -299,22 +301,22 @@ module.exports = class Cpx extends EventEmitter {
      * @thrpws {Error} IO error.
      */
     cleanSync() {
-        const dest = this.src2dst(this.source);
+        const dest = this.src2dst(this.source)
         if (dest === this.source) {
-            return;
+            return
         }
 
         for (const path of searchSync(dest, {nodir: true, silent: true})) {
-            unlinkSync(path);
+            unlinkSync(path)
             try {
-                rmdirSync(dirname(path));
+                rmdirSync(dirname(path))
             }
             catch (err) {
                 if (err.code !== "ENOTEMPTY") {
-                    throw err;
+                    throw err
                 }
             }
-            this.emit("remove", {path});
+            this.emit("remove", {path})
         }
     }
 
@@ -329,9 +331,9 @@ module.exports = class Cpx extends EventEmitter {
      * @returns {void}
      */
     copy(cb = null) {
-        assert(cb == null || typeof cb === "function");
+        assert(cb == null || typeof cb === "function")
 
-        doAll(this, this.source, this.enqueueCopy, cb);
+        doAll(this, this.source, this.enqueueCopy, cb)
     }
 
     /**
@@ -342,24 +344,24 @@ module.exports = class Cpx extends EventEmitter {
      */
     copySync() {
         if (this.transformFactories.length > 0) {
-            throw new Error("Synchronous copy can't use the transform option.");
+            throw new Error("Synchronous copy can't use the transform option.")
         }
 
         const srcPaths = searchSync(
             this.source,
             {nodir: true, silent: true, follow: this.dereference}
-        );
+        )
         srcPaths.forEach(srcPath => {
-            const dstPath = this.src2dst(srcPath);
+            const dstPath = this.src2dst(srcPath)
             if (dstPath === srcPath) {
-                return;
+                return
             }
 
-            mkdirSync(dirname(dstPath));
-            copyFileSync(srcPath, dstPath);
+            mkdirSync(dirname(dstPath))
+            copyFileSync(srcPath, dstPath)
 
-            this.emit("copy", {srcPath, dstPath});
-        });
+            this.emit("copy", {srcPath, dstPath})
+        })
     }
 
     //============================================================================
@@ -375,64 +377,64 @@ module.exports = class Cpx extends EventEmitter {
      */
     watch() {
         if (this[WATCHER] != null) {
-            throw new Error("InvalidStateError");
+            throw new Error("InvalidStateError")
         }
 
-        const m = new Minimatch(this.source);
-        let firstCopyCount = 0;
-        let ready = false;
+        const m = new Minimatch(this.source)
+        let firstCopyCount = 0
+        let ready = false
         const fireReadyIfReady = () => {
             if (ready && firstCopyCount === 0) {
-                this.emit("watch-ready");
+                this.emit("watch-ready")
             }
-        };
+        }
 
         this[WATCHER] = createWatcher(
             this.base,
             {
                 cwd: process.cwd(),
                 persistent: true,
-                followSymlinks: this.dereference
+                followSymlinks: this.dereference,
             }
-        );
+        )
         this[WATCHER]
             .on("add", (path) => {
-                const normalizedPath = normalizePath(path);
+                const normalizedPath = normalizePath(path)
                 if (m.match(normalizedPath)) {
                     if (ready) {
-                        this.enqueueCopy(normalizedPath);
+                        this.enqueueCopy(normalizedPath)
                     }
                     else {
-                        firstCopyCount += 1;
+                        firstCopyCount += 1
                         this.enqueueCopy(normalizedPath, () => {
-                            firstCopyCount -= 1;
-                            fireReadyIfReady();
-                        });
+                            firstCopyCount -= 1
+                            fireReadyIfReady()
+                        })
                     }
                 }
             })
             .on("unlink", (path) => {
-                const normalizedPath = normalizePath(path);
+                const normalizedPath = normalizePath(path)
                 if (m.match(normalizedPath)) {
-                    const dstPath = this.src2dst(normalizedPath);
+                    const dstPath = this.src2dst(normalizedPath)
                     if (dstPath !== normalizedPath) {
-                        this.enqueueRemove(dstPath);
+                        this.enqueueRemove(dstPath)
                     }
                 }
             })
             .on("change", (path) => {
-                const normalizedPath = normalizePath(path);
+                const normalizedPath = normalizePath(path)
                 if (m.match(normalizedPath)) {
-                    this.enqueueCopy(normalizedPath);
+                    this.enqueueCopy(normalizedPath)
                 }
             })
             .on("ready", () => {
-                ready = true;
-                fireReadyIfReady();
+                ready = true
+                fireReadyIfReady()
             })
             .on("error", (err) => {
-                this.emit("watch-error", err);
-            });
+                this.emit("watch-error", err)
+            })
     }
 
     /**
@@ -442,8 +444,8 @@ module.exports = class Cpx extends EventEmitter {
      */
     unwatch() {
         if (this[WATCHER] != null) {
-            this[WATCHER].close();
-            this[WATCHER] = null;
+            this[WATCHER].close()
+            this[WATCHER] = null
         }
     }
 
@@ -453,6 +455,6 @@ module.exports = class Cpx extends EventEmitter {
      * @returns {void}
      */
     close() {
-        this.unwatch();
+        this.unwatch()
     }
-};
+}

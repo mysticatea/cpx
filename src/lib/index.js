@@ -4,11 +4,11 @@
  * See LICENSE file in root directory for full license.
  */
 
-"use strict";
+"use strict"
 
-const Cpx = require("./cpx");
+const Cpx = require("./cpx")
 
-exports.Cpx = Cpx;
+exports.Cpx = Cpx
 
 /**
  * Copies the files which match with a given glob pattern.
@@ -28,28 +28,28 @@ exports.Cpx = Cpx;
 exports.copy = function copy(source, outDir, options = null, cb = null) {
     if (typeof options === "function") {
         /* eslint-disable no-param-reassign */
-        cb = options;
-        options = null;
+        cb = options
+        options = null
         /* eslint-enable no-param-reassign */
     }
 
-    const cpx = new Cpx(source, outDir, options);
+    const cpx = new Cpx(source, outDir, options)
     if (options && options.clean) {
         cpx.clean(err => {
             if (err == null) {
-                cpx.copy(cb);
+                cpx.copy(cb)
             }
             else if (cb != null) {
-                cb(err);
+                cb(err)
             }
-        });
+        })
     }
     else {
-        cpx.copy(cb);
+        cpx.copy(cb)
     }
 
-    return cpx;
-};
+    return cpx
+}
 
 /**
  * Copies the files which match with a given glob pattern.
@@ -64,12 +64,12 @@ exports.copy = function copy(source, outDir, options = null, cb = null) {
  * @returns {Cpx} A Cpx instance.
  */
 exports.copySync = function copySync(source, outDir, options = null) {
-    const cpx = new Cpx(source, outDir, options);
+    const cpx = new Cpx(source, outDir, options)
     if (options && options.clean) {
-        cpx.cleanSync();
+        cpx.cleanSync()
     }
-    cpx.copySync();
-};
+    cpx.copySync()
+}
 
 /**
  * Copies the files which match with a given glob pattern.
@@ -85,20 +85,20 @@ exports.copySync = function copySync(source, outDir, options = null) {
  * @returns {Cpx} A Cpx instance.
  */
 exports.watch = function watch(source, outDir, options = null) {
-    const cpx = new Cpx(source, outDir, options);
+    const cpx = new Cpx(source, outDir, options)
     if (options && options.clean) {
         cpx.clean(err => {
             if (err == null) {
-                cpx.watch();
+                cpx.watch()
             }
             else {
-                cpx.emit("watch-error", err);
+                cpx.emit("watch-error", err)
             }
-        });
+        })
     }
     else {
-        cpx.watch();
+        cpx.watch()
     }
 
-    return cpx;
-};
+    return cpx
+}

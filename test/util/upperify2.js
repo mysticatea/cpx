@@ -5,14 +5,14 @@
  */
 /* eslint-disable no-var */
 
-"use strict";
+"use strict"
 
 //------------------------------------------------------------------------------
 // Requirements
 //------------------------------------------------------------------------------
 
-var Transform = require("stream").Transform;
-var inherits = require("util").inherits;
+var Transform = require("stream").Transform
+var inherits = require("util").inherits
 
 //------------------------------------------------------------------------------
 // Helpers
@@ -23,27 +23,27 @@ var inherits = require("util").inherits;
  * @constructor
  */
 function Upperify() {
-    Transform.call(this);
+    Transform.call(this)
 }
-inherits(Upperify, Transform);
+inherits(Upperify, Transform)
 
 Object.defineProperties(Upperify.prototype, {
     _transform: {
         value: function _transform(data, encoding, callback) {
-            callback(null, data.toString().toUpperCase());
+            callback(null, data.toString().toUpperCase())
         },
         configurable: true,
         enumerable: false,
-        writable: true
-    }
-});
+        writable: true,
+    },
+})
 
 /**
  * Creates a transform stream to convert data to upper cases.
  * @returns {stream.Transform} A transform stream to convert data to upper cases.
  */
 function toUpperCase() {
-    return new Upperify();
+    return new Upperify()
 }
 
 //------------------------------------------------------------------------------
@@ -51,8 +51,8 @@ function toUpperCase() {
 //------------------------------------------------------------------------------
 
 if (require.main === module) {
-    process.stdin.pipe(toUpperCase()).pipe(process.stdout);
+    process.stdin.pipe(toUpperCase()).pipe(process.stdout)
 }
 else {
-    module.exports = toUpperCase;
+    module.exports = toUpperCase
 }

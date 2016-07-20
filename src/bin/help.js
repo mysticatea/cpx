@@ -5,7 +5,7 @@
  */
 /* eslint no-console:0 */
 
-"use strict";
+"use strict"
 
 /**
  * Prints the help text.
@@ -42,5 +42,5 @@ Examples:
 
 See Also:
     https://github.com/mysticatea/cpx
-`);
-};
+`)
+}

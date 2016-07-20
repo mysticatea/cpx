@@ -5,13 +5,13 @@
  */
 /* eslint-disable no-var */
 
-"use strict";
+"use strict"
 
 //------------------------------------------------------------------------------
 // Requirements
 //------------------------------------------------------------------------------
 
-var through = require("through");
+var through = require("through")
 
 //------------------------------------------------------------------------------
 // Helpers
@@ -24,12 +24,12 @@ var through = require("through");
 function toUpperCase() {
     return through(
         /* @this stream.Transform */ function write(chunk) {
-            this.queue(chunk.toString().toUpperCase());
+            this.queue(chunk.toString().toUpperCase())
         },
         /* @this stream.Transform */ function end() {
-            this.queue(null);
+            this.queue(null)
         }
-    );
+    )
 }
 
 //------------------------------------------------------------------------------
@@ -37,8 +37,8 @@ function toUpperCase() {
 //------------------------------------------------------------------------------
 
 if (require.main === module) {
-    process.stdin.pipe(toUpperCase()).pipe(process.stdout);
+    process.stdin.pipe(toUpperCase()).pipe(process.stdout)
 }
 else {
-    module.exports = toUpperCase;
+    module.exports = toUpperCase
 }

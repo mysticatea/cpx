@@ -4,12 +4,12 @@
  * See LICENSE file in root directory for full license.
  */
 
-"use strict";
+"use strict"
 
 // This require("power-assert") will be removed in the build script.
 // eslint-disable-next-line node/no-unpublished-require
-const assert = require("power-assert");
-const TAIL = Symbol("tail");
+const assert = require("power-assert")
+const TAIL = Symbol("tail")
 
 /**
  * Dequeue jobs.
@@ -21,13 +21,13 @@ const TAIL = Symbol("tail");
 function dequeue(queue, item) {
     item.action(() => {
         if (item.next) {
-            setImmediate(dequeue, queue, item.next);
+            setImmediate(dequeue, queue, item.next)
         }
         else {
-            assert(queue[TAIL] === item);
-            queue[TAIL] = null;
+            assert(queue[TAIL] === item)
+            queue[TAIL] = null
         }
-    });
+    })
 }
 
 /**
@@ -36,8 +36,11 @@ function dequeue(queue, item) {
  * @private
  */
 module.exports = class Queue {
+    /**
+     * Constructor.
+     */
     constructor() {
-        this[TAIL] = null;
+        this[TAIL] = null
     }
 
     /**
@@ -52,15 +55,15 @@ module.exports = class Queue {
      * @returns {void}
      */
     push(action) {
-        assert(typeof action === "function");
+        assert(typeof action === "function")
 
-        const item = {action, next: null};
+        const item = {action, next: null}
         if (this[TAIL] != null) {
-            this[TAIL] = this[TAIL].next = item;
+            this[TAIL] = this[TAIL].next = item
         }
         else {
-            this[TAIL] = item;
-            setImmediate(dequeue, this, item);
+            this[TAIL] = item
+            setImmediate(dequeue, this, item)
         }
     }
-};
+}

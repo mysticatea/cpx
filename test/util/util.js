@@ -4,18 +4,18 @@
  * See LICENSE file in root directory for full license.
  */
 
-"use strict";
+"use strict"
 
 //------------------------------------------------------------------------------
 // Requirements
 //------------------------------------------------------------------------------
 
-const {exec} = require("child_process");
-const {dirname} = require("path");
-const {readFileSync, writeFileSync} = require("fs");
-const {sync: mkdirSync} = require("mkdirp");
-const {sync: rimrafSync} = require("rimraf");
-const {exec: execSync} = require("shelljs");
+const {exec} = require("child_process")
+const {dirname} = require("path")
+const {readFileSync, writeFileSync} = require("fs")
+const {sync: mkdirSync} = require("mkdirp")
+const {sync: rimrafSync} = require("rimraf")
+const {exec: execSync} = require("shelljs")
 
 //------------------------------------------------------------------------------
 // Public Interface
@@ -29,9 +29,9 @@ const {exec: execSync} = require("shelljs");
  * @returns {void}
  */
 const writeFile = exports.writeFile = function writeFile(path, contentText) {
-    mkdirSync(dirname(path));
-    writeFileSync(path, contentText);
-};
+    mkdirSync(dirname(path))
+    writeFileSync(path, contentText)
+}
 
 /**
  * Removes a specific file.
@@ -40,8 +40,8 @@ const writeFile = exports.writeFile = function writeFile(path, contentText) {
  * @returns {void}
  */
 exports.removeFile = function removeFile(path) {
-    rimrafSync(path);
-};
+    rimrafSync(path)
+}
 
 /**
  * Sets up test files.
@@ -51,9 +51,9 @@ exports.removeFile = function removeFile(path) {
  */
 exports.setupTestDir = function setupTestDir(dataset) {
     for (const path in dataset) {
-        writeFile(path, dataset[path]);
+        writeFile(path, dataset[path])
     }
-};
+}
 
 /**
  * Removes test data.
@@ -62,8 +62,8 @@ exports.setupTestDir = function setupTestDir(dataset) {
  * @returns {void}
  */
 exports.teardownTestDir = function teardownTestDir(testRootPath) {
-    rimrafSync(testRootPath);
-};
+    rimrafSync(testRootPath)
+}
 
 /**
  * Gets the content of a specific file.
@@ -73,12 +73,12 @@ exports.teardownTestDir = function teardownTestDir(testRootPath) {
  */
 exports.content = function content(path) {
     try {
-        return readFileSync(path, {encoding: "utf8"});
+        return readFileSync(path, {encoding: "utf8"})
     }
-    catch (err) {
-        return null;
+    catch (_err) {
+        return null
     }
-};
+}
 
 /**
  * Execute cpx command.
@@ -86,8 +86,8 @@ exports.content = function content(path) {
  * @returns {child_process.ChildProcess} A child process object.
  */
 exports.execCommand = function execCommand(args) {
-    return exec(`babel-node src/bin/index.js ${args}`);
-};
+    return exec(`babel-node src/bin/index.js ${args}`)
+}
 
 /**
  * Execute cpx command.
@@ -95,5 +95,5 @@ exports.execCommand = function execCommand(args) {
  * @returns {void}
  */
 exports.execCommandSync = function execCommandSync(args) {
-    execSync(`babel-node src/bin/index.js ${args}`);
-};
+    execSync(`babel-node src/bin/index.js ${args}`)
+}

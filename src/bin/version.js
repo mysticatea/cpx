@@ -5,7 +5,7 @@
  */
 /* eslint no-console:0 */
 
-"use strict";
+"use strict"
 
 /**
  * Reads `package.json` then returns the version text.
@@ -15,10 +15,10 @@
  */
 function get(path) {
     try {
-        return require(path).version;
+        return require(path).version
     }
-    catch (err) {
-        return null;
+    catch (_err) {
+        return null
     }
 }
 
@@ -28,5 +28,5 @@ function get(path) {
  * @returns {void}
  */
 module.exports = function version() {
-    console.log(`v${get("../package.json") || get("../../package.json")}`);
-};
+    console.log(`v${get("../package.json") || get("../../package.json")}`)
+}
