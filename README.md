@@ -64,7 +64,7 @@ cpx "src/**/*.{html,png,jpg}" app -w & watchify src/index.js -o app/index.js
 You can use shell commands to convert each file.
 
 ```
-cpx "src/**/*.js" app -w -c "babel --source-maps-inline"
+cpx "src/**/*.js" app -w -c "babel --source-maps inline"
 ```
 
 You can use the transform packages for Browserify.
