@@ -31,6 +31,7 @@ const OUT_DIR = Symbol("outDir")
 const PRESERVE = Symbol("preserve")
 const SOURCE = Symbol("source")
 const TRANSFORM = Symbol("transform")
+const UPDATE = Symbol("update")
 const QUEUE = Symbol("queue")
 const WATCHER = Symbol("watcher")
 
@@ -137,6 +138,7 @@ module.exports = class Cpx extends EventEmitter {
         this[DEREFERENCE] = Boolean(options.dereference)
         this[PRESERVE] = Boolean(options.preserve)
         this[TRANSFORM] = [].concat(options.transform).filter(Boolean)
+        this[UPDATE] = Boolean(options.update)
         this[QUEUE] = new Queue()
         this[BASE_DIR] = null
         this[WATCHER] = null
@@ -184,6 +186,14 @@ module.exports = class Cpx extends EventEmitter {
      */
     get transformFactories() {
         return this[TRANSFORM]
+    }
+
+    /**
+     * The flag to disallow overwriting.
+     * @type {boolean}
+     */
+    get update() {
+        return this[UPDATE]
     }
 
     /**

@@ -6,7 +6,7 @@
 
 "use strict"
 
-const {symlinkSync, statSync} = require("fs")
+const {symlinkSync, statSync, utimesSync} = require("fs")
 const {resolve: resolvePath} = require("path")
 const assert = require("power-assert")
 const cpx = require("../src/lib")
@@ -292,6 +292,106 @@ describe("The copy method", () => {
 
         it("command version.", () => {
             execCommandSync("LICENSE test-ws --preserve")
+            verifyFiles()
+        })
+    })
+
+    describe("should not copy specified files if the source file is older than the destination file, when `--update` option was given:", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/a.txt": "newer source",
+                "test-ws/b.txt": "older source",
+                "test-ws/a/a.txt": "older destination",
+                "test-ws/a/b.txt": "newer destination",
+            })
+
+            const older = Date.now() / 1000
+            const newer = older + 1
+            utimesSync("test-ws/a.txt", newer, newer)
+            utimesSync("test-ws/b.txt", older, older)
+            utimesSync("test-ws/a/a.txt", older, older)
+            utimesSync("test-ws/a/b.txt", newer, newer)
+        })
+        afterEach(() => {
+            teardownTestDir("test-ws")
+        })
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/a.txt") === "newer source")
+            assert(content("test-ws/b.txt") === "older source")
+            assert(content("test-ws/a/a.txt") === "newer source")
+            assert(content("test-ws/a/b.txt") === "newer destination")
+        }
+
+        it("lib async version.", (done) => {
+            cpx.copy("test-ws/*.txt", "test-ws/a", {update: true}, (err) => {
+                assert(err === null)
+                verifyFiles()
+                done()
+            })
+        })
+
+        it("lib sync version.", () => {
+            cpx.copySync("test-ws/*.txt", "test-ws/a", {update: true})
+            verifyFiles()
+        })
+
+        it("command version.", () => {
+            execCommandSync("\"test-ws/*.txt\" test-ws/a --update")
+            verifyFiles()
+        })
+    })
+
+    describe("should copy specified files when `--update` option was not given:", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/a.txt": "newer source",
+                "test-ws/b.txt": "older source",
+                "test-ws/a/a.txt": "older destination",
+                "test-ws/a/b.txt": "newer destination",
+            })
+
+            const older = Date.now() / 1000
+            const newer = older + 1
+            utimesSync("test-ws/a.txt", newer, newer)
+            utimesSync("test-ws/b.txt", older, older)
+            utimesSync("test-ws/a/a.txt", older, older)
+            utimesSync("test-ws/a/b.txt", newer, newer)
+        })
+        afterEach(() => {
+            teardownTestDir("test-ws")
+        })
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/a.txt") === "newer source")
+            assert(content("test-ws/b.txt") === "older source")
+            assert(content("test-ws/a/a.txt") === "newer source")
+            assert(content("test-ws/a/b.txt") === "older source")
+        }
+
+        it("lib async version.", (done) => {
+            cpx.copy("test-ws/*.txt", "test-ws/a", (err) => {
+                assert(err === null)
+                verifyFiles()
+                done()
+            })
+        })
+
+        it("lib sync version.", () => {
+            cpx.copySync("test-ws/*.txt", "test-ws/a")
+            verifyFiles()
+        })
+
+        it("command version.", () => {
+            execCommandSync("\"test-ws/*.txt\" test-ws/a")
             verifyFiles()
         })
     })

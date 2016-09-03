@@ -94,6 +94,7 @@ module.exports = function main(source, outDir, args) {
             transform: mergedTransformFactories,
             dereference: args.dereference,
             preserve: args.preserve,
+            update: args.update,
         }
     )
     if (args.verbose) {

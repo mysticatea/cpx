@@ -77,6 +77,7 @@ function copyBody(
  * @param {object} options - Options.
  * @param {function[]} options.transformFactories - Factory functions for transform streams.
  * @param {boolean} options.preserve - The flag to copy attributes.
+ * @param {boolean} options.update - The flag to disallow overwriting.
  * @param {function} cb - A callback function that called after copied.
  * @returns {void}
  * @private
@@ -87,6 +88,7 @@ module.exports = function copy(
     {
         transformFactories,
         preserve,
+        update,
     },
     cb
 ) {
@@ -102,6 +104,19 @@ module.exports = function copy(
             next()
         }
     }))
+    if (update) {
+        q.push(next => fs.stat(dst, (err, dstStat) => {
+            if (!err && dstStat.mtime.getTime() > stat.mtime.getTime()) {
+                // Don't overwrite because the file on destination is newer than
+                // the source file.
+                cb(null)
+            }
+            else {
+                next()
+            }
+        }))
+    }
+
     q.push(next => copyBody(src, dst, transformFactories, (err) => {
         if (err) {
             cb(err)
@@ -140,6 +155,6 @@ module.exports = function copy(
 
     q.push(next => {
         next()
-        cb()
+        cb(null)
     })
 }

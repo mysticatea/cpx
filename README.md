@@ -39,6 +39,8 @@ Options:
                               This attributes are uid, gid, atime, and mtime.
     -t, --transform <name>    A module name to transform each file. cpx lookups
                                 the specified name via "require()".
+    -u, --update              The flag to not overwrite files on destination if
+                              the source file is older.
     -v, --verbose             Print copied/removed files.
     -V, --version             Print the version number
     -w, --watch               Watch for files that matches <source>, and copy
@@ -101,6 +103,7 @@ cpx.copy(source, dest, callback)
   - **options.dereference** `{boolean}` -- The flag to follow symbolic links when copying from them.
   - **options.preserve** `{boolean}` -- The flag to copy uid, gid, atime, and mtime of files.
   - **options.transform** `{((filepath: string) => stream.Transform)[]}` -- Functions that creates a `stream.Transform` object to transform each copying file.
+  - **options.update** `{boolean}` -- The flag to not overwrite files on destination if the source file is older.
 - **callback** `{(err: Error|null) => void}` -- A function that is called at done.
 
 Copy files that matches with `source` glob to `dest` directory.

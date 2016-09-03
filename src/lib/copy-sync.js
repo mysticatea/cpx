@@ -45,11 +45,26 @@ function copyBodySync(src, dst) {
  * @param {string} dst - A path of the destination file.
  * @param {object} options - Options.
  * @param {boolean} options.preserve - The flag to copy attributes.
+ * @param {boolean} options.update - The flag to disallow overwriting.
  * @returns {void}
  * @private
  */
-module.exports = function copySync(src, dst, {preserve}) {
+module.exports = function copySync(src, dst, {preserve, update}) {
     const stat = fs.statSync(src)
+
+    if (update) {
+        try {
+            const dstStat = fs.statSync(dst)
+            if (dstStat.mtime.getTime() > stat.mtime.getTime()) {
+                // Don't overwrite because the file on destination is newer than
+                // the source file.
+                return
+            }
+        }
+        catch (_err) {
+            // ignore - The file may not exist.
+        }
+    }
 
     copyBodySync(src, dst)
     fs.chmodSync(dst, stat.mode)
