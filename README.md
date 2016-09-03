@@ -1,8 +1,9 @@
 # cpx
 
 [![npm version](https://img.shields.io/npm/v/cpx.svg)](https://www.npmjs.com/package/cpx)
-[![Downloads/month](https://img.shields.io/npm/dm/cpx.svg)](https://www.npmjs.com/package/cpx)
+[![Downloads/month](https://img.shields.io/npm/dm/cpx.svg)](http://www.npmtrends.com/cpx)
 [![Build Status](https://travis-ci.org/mysticatea/cpx.svg?branch=master)](https://travis-ci.org/mysticatea/cpx)
+[![Dependency Status](https://dependencyci.com/github/mysticatea/cpx/badge)](https://dependencyci.com/github/mysticatea/cpx)
 [![Dependency Status](https://david-dm.org/mysticatea/cpx.svg)](https://david-dm.org/mysticatea/cpx)
 
 Copy file globs, watching for changes.
@@ -46,7 +47,7 @@ Options:
 ## Example
 
 ```
-cpx "src/**/*.{html,png,jpg}" app --watch
+$ cpx "src/**/*.{html,png,jpg}" app --watch
 ```
 
 This example will copy html/png/jpg files from `src` directory to `app`
@@ -58,19 +59,19 @@ Whenever the files are changed, copy them.
 You can use together [Browserify](http://browserify.org).
 
 ```
-cpx "src/**/*.{html,png,jpg}" app -w & watchify src/index.js -o app/index.js
+$ cpx "src/**/*.{html,png,jpg}" app -w & watchify src/index.js -o app/index.js
 ```
 
 You can use shell commands to convert each file.
 
 ```
-cpx "src/**/*.js" app -w -c "babel --source-maps inline"
+$ cpx "src/**/*.js" app -w -c "babel --source-maps inline"
 ```
 
 You can use the transform packages for Browserify.
 
 ```
-cpx "src/**/*.js" app -w -t babelify -t uglifyify
+$ cpx "src/**/*.js" app -w -t babelify -t uglifyify
 ```
 
 It maybe can use to add header comment, to optimize images, or etc...
@@ -131,3 +132,32 @@ Arguments is same as `cpx.copy`.
 - `.on("remove", (e) => { ... })` : Be fired after file is removed. `e.path` is a path of removed file.
 - `.on("watch-raedy", () => { ... })` : Be fired when started watching files, after the first copying.
 - `.on("watch-error", (err) => { ... })` : Be fired when occured errors during watching.
+
+## Changelog
+
+[GitHub Releases](https://github.com/mysticatea/npm-run-all/releases)
+
+## Contributing
+
+Thank you for contributions!
+
+### Bug Reports or Feature Requests
+
+Please use GitHub Issues.
+
+### Document Corrections
+
+Please use GitHub Pull Requests.
+I would especially thank for document corrections since I'm not familiar with English.
+
+### Feature Implementing
+
+Please use GitHub Pull Requests.
+
+There are some npm-scripts to help developments.
+
+- `npm test` - Run tests and collect coverage.
+- `npm run build` - Make lib directory from src directory.
+- `npm run clean` - Delete directories (folders) which are created by other commands.
+- `npm run lint` - Run ESLint.
+- `npm run watch` - Run tests (not collect coverage) when each file was modified.
