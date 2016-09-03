@@ -6,8 +6,8 @@
             "sourceMaps": false
         },
         "development": {
-            "presets": ["es2015"],
-            "plugins": ["transform-runtime", "espower"],
+            "presets": ["es2015", "power-assert"],
+            "plugins": ["transform-runtime"],
             "sourceMaps": "inline"
         }
     }

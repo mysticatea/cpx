@@ -6,9 +6,7 @@
 
 "use strict"
 
-// This require("power-assert") will be removed in the build script.
-// eslint-disable-next-line node/no-unpublished-require
-const assert = require("power-assert")
+const assert = require("assert")
 const TAIL = Symbol("tail")
 
 /**
