@@ -28,6 +28,7 @@ const Queue = require("./queue")
 const BASE_DIR = Symbol("baseDir")
 const DEREFERENCE = Symbol("dereference")
 const OUT_DIR = Symbol("outDir")
+const PRESERVE = Symbol("preserve")
 const SOURCE = Symbol("source")
 const TRANSFORM = Symbol("transform")
 const QUEUE = Symbol("queue")
@@ -134,6 +135,7 @@ module.exports = class Cpx extends EventEmitter {
         this[SOURCE] = normalizePath(source)
         this[OUT_DIR] = normalizePath(outDir)
         this[DEREFERENCE] = Boolean(options.dereference)
+        this[PRESERVE] = Boolean(options.preserve)
         this[TRANSFORM] = [].concat(options.transform).filter(Boolean)
         this[QUEUE] = new Queue()
         this[BASE_DIR] = null
@@ -166,6 +168,14 @@ module.exports = class Cpx extends EventEmitter {
      */
     get dereference() {
         return this[DEREFERENCE]
+    }
+
+    /**
+     * The flag to copy file attributes.
+     * @type {boolean}
+     */
+    get preserve() {
+        return this[PRESERVE]
     }
 
     /**
@@ -225,16 +235,21 @@ module.exports = class Cpx extends EventEmitter {
             mkdir(dirname(dstPath), next)
         })
         this[QUEUE].push(next => {
-            copyFile(srcPath, dstPath, this.transformFactories, (err) => {
-                if (err == null) {
-                    this.emit("copy", {srcPath, dstPath})
-                }
+            copyFile(
+                srcPath,
+                dstPath,
+                this,
+                (err) => {
+                    if (err == null) {
+                        this.emit("copy", {srcPath, dstPath})
+                    }
 
-                next()
-                if (cb != null) {
-                    cb(err || null)
+                    next()
+                    if (cb != null) {
+                        cb(err || null)
+                    }
                 }
-            })
+            )
         })
     }
 
@@ -358,7 +373,7 @@ module.exports = class Cpx extends EventEmitter {
             }
 
             mkdirSync(dirname(dstPath))
-            copyFileSync(srcPath, dstPath)
+            copyFileSync(srcPath, dstPath, this)
 
             this.emit("copy", {srcPath, dstPath})
         })

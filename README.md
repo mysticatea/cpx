@@ -35,6 +35,8 @@ Options:
                               <dest> directory before the first copying.
     -L, --dereference         Follow symbolic links when copying from them.
     -h, --help                Print usage information
+    -p, --preserve            The flag to copy attributes of files.
+                              This attributes are uid, gid, atime, and mtime.
     -t, --transform <name>    A module name to transform each file. cpx lookups
                                 the specified name via "require()".
     -v, --verbose             Print copied/removed files.
@@ -95,8 +97,9 @@ cpx.copy(source, dest, callback)
 - **source** `{string}` -- A file glob of copy targets.
 - **dest** `{string}` -- A file path of a destination directory.
 - **options** `{object}`
-  - **options.clean** `{boolean}` -- A flag to remove files that copied on past before copy.
-  - **options.dereference** `{boolean}` -- A flag to follow symbolic links when copying from them.
+  - **options.clean** `{boolean}` -- The flag to remove files that copied on past before copy.
+  - **options.dereference** `{boolean}` -- The flag to follow symbolic links when copying from them.
+  - **options.preserve** `{boolean}` -- The flag to copy uid, gid, atime, and mtime of files.
   - **options.transform** `{((filepath: string) => stream.Transform)[]}` -- Functions that creates a `stream.Transform` object to transform each copying file.
 - **callback** `{(err: Error|null) => void}` -- A function that is called at done.
 

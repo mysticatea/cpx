@@ -7,7 +7,7 @@
 "use strict"
 
 const {Buffer} = require("safe-buffer")
-const {openSync, closeSync, readSync, writeSync} = require("fs")
+const fs = require("fs")
 const MAX_BUFFER = 2048
 
 /**
@@ -16,26 +16,46 @@ const MAX_BUFFER = 2048
  * @returns {void}
  * @private
  */
-module.exports = function copySync(src, dst) {
+function copyBodySync(src, dst) {
     const buffer = Buffer.allocUnsafe(MAX_BUFFER)
     let bytesRead = MAX_BUFFER
     let pos = 0
 
-    const input = openSync(src, "r")
+    const input = fs.openSync(src, "r")
     try {
-        const output = openSync(dst, "w")
+        const output = fs.openSync(dst, "w")
         try {
             while (MAX_BUFFER === bytesRead) {
-                bytesRead = readSync(input, buffer, 0, MAX_BUFFER, pos)
-                writeSync(output, buffer, 0, bytesRead)
+                bytesRead = fs.readSync(input, buffer, 0, MAX_BUFFER, pos)
+                fs.writeSync(output, buffer, 0, bytesRead)
                 pos += bytesRead
             }
         }
         finally {
-            closeSync(output)
+            fs.closeSync(output)
         }
     }
     finally {
-        closeSync(input)
+        fs.closeSync(input)
+    }
+}
+
+/**
+ * @param {string} src - A path of the source file.
+ * @param {string} dst - A path of the destination file.
+ * @param {object} options - Options.
+ * @param {boolean} options.preserve - The flag to copy attributes.
+ * @returns {void}
+ * @private
+ */
+module.exports = function copySync(src, dst, {preserve}) {
+    const stat = fs.statSync(src)
+
+    copyBodySync(src, dst)
+    fs.chmodSync(dst, stat.mode)
+
+    if (preserve) {
+        fs.chownSync(dst, stat.uid, stat.gid)
+        fs.utimesSync(dst, stat.atime, stat.mtime)
     }
 }

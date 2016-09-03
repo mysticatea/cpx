@@ -6,7 +6,7 @@
 
 "use strict"
 
-const {symlinkSync} = require("fs")
+const {symlinkSync, statSync} = require("fs")
 const {resolve: resolvePath} = require("path")
 const assert = require("power-assert")
 const cpx = require("../src/lib")
@@ -166,6 +166,142 @@ describe("The copy method", () => {
 
         it("command version.", () => {
             execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --dereference")
+            verifyFiles()
+        })
+    })
+
+    describe("should copy specified files with globs when `--preserve` option was given:", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/untachable.txt": "untachable",
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/b/this-is.txt": "A pen",
+                "test-ws/a/b/that-is.txt": "A note",
+                "test-ws/a/b/no-copy.dat": "no-copy",
+            })
+        })
+        afterEach(() => {
+            teardownTestDir("test-ws")
+        })
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/untachable.txt") === "untachable")
+            assert(content("test-ws/a/hello.txt") === "Hello")
+            assert(content("test-ws/a/b/this-is.txt") === "A pen")
+            assert(content("test-ws/a/b/that-is.txt") === "A note")
+            assert(content("test-ws/a/b/no-copy.dat") === "no-copy")
+            assert(content("test-ws/b/untachable.txt") === null)
+            assert(content("test-ws/b/hello.txt") === "Hello")
+            assert(content("test-ws/b/b/this-is.txt") === "A pen")
+            assert(content("test-ws/b/b/that-is.txt") === "A note")
+            assert(content("test-ws/b/b/no-copy.dat") === null)
+        }
+
+        it("lib async version.", (done) => {
+            cpx.copy("test-ws/a/**/*.txt", "test-ws/b", {preserve: true}, (err) => {
+                assert(err === null)
+                verifyFiles()
+                done()
+            })
+        })
+
+        it("lib sync version.", () => {
+            cpx.copySync("test-ws/a/**/*.txt", "test-ws/b", {preserve: true})
+            verifyFiles()
+        })
+
+        it("command version.", () => {
+            execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --preserve")
+            verifyFiles()
+        })
+    })
+
+    describe("should not copy attributes when `--preserve` option was not given:", () => {
+        afterEach(() => {
+            teardownTestDir("test-ws")
+        })
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            const srcStat = statSync("./LICENSE")
+            const dstStat = statSync("./test-ws/LICENSE")
+
+            if (process.platform === "win32") {
+                const srcMtime = Math.floor(srcStat.mtime.getTime() / 1000)
+                const dstMtime = Math.floor(dstStat.mtime.getTime() / 1000)
+                assert(srcMtime !== dstMtime)
+            }
+            else {
+                assert(srcStat.mtime.getTime() !== dstStat.mtime.getTime())
+            }
+        }
+
+        it("lib async version.", (done) => {
+            cpx.copy("LICENSE", "test-ws", (err) => {
+                assert(err === null)
+                verifyFiles()
+                done()
+            })
+        })
+
+        it("lib sync version.", () => {
+            cpx.copySync("LICENSE", "test-ws")
+            verifyFiles()
+        })
+
+        it("command version.", () => {
+            execCommandSync("LICENSE test-ws")
+            verifyFiles()
+        })
+    })
+
+    describe("should copy attributes when `--preserve` option was given:", () => {
+        afterEach(() => {
+            teardownTestDir("test-ws")
+        })
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            const srcStat = statSync("./LICENSE")
+            const dstStat = statSync("./test-ws/LICENSE")
+
+            assert(srcStat.uid === dstStat.uid)
+            assert(srcStat.gid === dstStat.gid)
+            if (process.platform === "win32") {
+                const srcMtime = Math.floor(srcStat.mtime.getTime() / 1000)
+                const dstMtime = Math.floor(dstStat.mtime.getTime() / 1000)
+                assert(srcMtime === dstMtime)
+            }
+            else {
+                assert(srcStat.mtime.getTime() === dstStat.mtime.getTime())
+            }
+        }
+
+        it("lib async version.", (done) => {
+            cpx.copy("LICENSE", "test-ws", {preserve: true}, (err) => {
+                assert(err === null)
+                verifyFiles()
+                done()
+            })
+        })
+
+        it("lib sync version.", () => {
+            cpx.copySync("LICENSE", "test-ws", {preserve: true})
+            verifyFiles()
+        })
+
+        it("command version.", () => {
+            execCommandSync("LICENSE test-ws --preserve")
             verifyFiles()
         })
     })

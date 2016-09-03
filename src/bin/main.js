@@ -90,7 +90,11 @@ module.exports = function main(source, outDir, args) {
     const cpx = new Cpx(
         source,
         outDir,
-        {transform: mergedTransformFactories, dereference: args.dereference}
+        {
+            transform: mergedTransformFactories,
+            dereference: args.dereference,
+            preserve: args.preserve,
+        }
     )
     if (args.verbose) {
         cpx.on("copy", (event) => {

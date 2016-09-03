@@ -18,13 +18,22 @@ const OPTIONS = {
     C: "clean",
     h: "help",
     L: "dereference",
+    p: "preserve",
     t: "transform",
     v: "verbose",
     V: "version",
     w: "watch",
 }
 const args = subarg(process.argv.slice(2), {
-    boolean: ["clean", "dereference", "help", "verbose", "version", "watch"],
+    boolean: [
+        "clean",
+        "dereference",
+        "help",
+        "preserve",
+        "verbose",
+        "version",
+        "watch",
+    ],
     alias: OPTIONS,
 })
 const source = args._[0]

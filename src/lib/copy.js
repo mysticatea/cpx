@@ -6,7 +6,8 @@
 
 "use strict"
 
-const {createReadStream, createWriteStream} = require("fs")
+const fs = require("fs")
+const Queue = require("./queue")
 
 /**
  * @param {string} src - A path of the source file.
@@ -16,9 +17,14 @@ const {createReadStream, createWriteStream} = require("fs")
  * @returns {void}
  * @private
  */
-module.exports = function copy(src, dst, transformFactories, cb) {
-    const reader = createReadStream(src)
-    const writer = createWriteStream(dst)
+function copyBody(
+    src,
+    dst,
+    transformFactories,
+    cb
+) {
+    const reader = fs.createReadStream(src)
+    const writer = fs.createWriteStream(dst)
     const streams = [reader]
 
     /**
@@ -26,16 +32,16 @@ module.exports = function copy(src, dst, transformFactories, cb) {
      * @param {Error|undefined} err - An error or undefined.
      * @returns {void}
      */
-    function done(err) {
+    function next(err) {
         try {
             streams.forEach(s => {
-                s.removeListener("error", done)
+                s.removeListener("error", next)
                 if (typeof s.destroy === "function") {
                     s.destroy()
                 }
             })
-            writer.removeListener("error", done)
-            writer.removeListener("finish", done)
+            writer.removeListener("error", next)
+            writer.removeListener("finish", next)
         }
         catch (cleanupErr) {
             cb(err || cleanupErr)
@@ -45,15 +51,15 @@ module.exports = function copy(src, dst, transformFactories, cb) {
         cb(err)
     }
 
-    reader.on("error", done)
-    writer.on("error", done)
-    writer.on("finish", done)
+    reader.on("error", next)
+    writer.on("error", next)
+    writer.on("finish", next)
 
     try {
         transformFactories
             .reduce((input, factory) => {
                 const t = factory(src)
-                t.on("error", done)
+                t.on("error", next)
                 streams.push(t)
 
                 return input.pipe(t)
@@ -61,6 +67,79 @@ module.exports = function copy(src, dst, transformFactories, cb) {
             .pipe(writer)
     }
     catch (err) {
-        done(err)
+        next(err)
     }
+}
+
+/**
+ * @param {string} src - A path of the source file.
+ * @param {string} dst - A path of the destination file.
+ * @param {object} options - Options.
+ * @param {function[]} options.transformFactories - Factory functions for transform streams.
+ * @param {boolean} options.preserve - The flag to copy attributes.
+ * @param {function} cb - A callback function that called after copied.
+ * @returns {void}
+ * @private
+ */
+module.exports = function copy(
+    src,
+    dst,
+    {
+        transformFactories,
+        preserve,
+    },
+    cb
+) {
+    const q = new Queue()
+    let stat = null
+
+    q.push(next => fs.stat(src, (err, result) => {
+        if (err) {
+            cb(err)
+        }
+        else {
+            stat = result
+            next()
+        }
+    }))
+    q.push(next => copyBody(src, dst, transformFactories, (err) => {
+        if (err) {
+            cb(err)
+        }
+        else {
+            next()
+        }
+    }))
+    q.push(next => fs.chmod(dst, stat.mode, (err) => {
+        if (err) {
+            cb(err)
+        }
+        else {
+            next()
+        }
+    }))
+
+    if (preserve) {
+        q.push(next => fs.chown(dst, stat.uid, stat.gid, (err) => {
+            if (err) {
+                cb(err)
+            }
+            else {
+                next()
+            }
+        }))
+        q.push(next => fs.utimes(dst, stat.atime, stat.mtime, (err) => {
+            if (err) {
+                cb(err)
+            }
+            else {
+                next()
+            }
+        }))
+    }
+
+    q.push(next => {
+        next()
+        cb()
+    })
 }

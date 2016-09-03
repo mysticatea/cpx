@@ -95,5 +95,5 @@ exports.execCommand = function execCommand(args) {
  * @returns {void}
  */
 exports.execCommandSync = function execCommandSync(args) {
-    return execSync(`babel-node -- src/bin/index.js ${args}`)
+    return execSync(`babel-node -- src/bin/index.js ${args}`, {silent: true})
 }
