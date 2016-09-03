@@ -141,7 +141,7 @@ Arguments is same as `cpx.copy`.
 
 ## Changelog
 
-[GitHub Releases](https://github.com/mysticatea/npm-run-all/releases)
+[GitHub Releases](https://github.com/mysticatea/cpx/releases)
 
 ## Contributing
 
