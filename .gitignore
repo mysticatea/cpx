@@ -1,4 +1,8 @@
+/.nyc_output
 /bin
+/coverage
 /lib
-/npm-debug.log
 /node_modules
+/test-ws
+/npm-debug.log
+/test.js

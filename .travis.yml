@@ -5,3 +5,5 @@ node_js:
   - "0.12"
   - "4"
   - "6"
+after_success:
+  - npm run codecov

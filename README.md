@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/cpx.svg)](https://www.npmjs.com/package/cpx)
 [![Downloads/month](https://img.shields.io/npm/dm/cpx.svg)](http://www.npmtrends.com/cpx)
 [![Build Status](https://travis-ci.org/mysticatea/cpx.svg?branch=master)](https://travis-ci.org/mysticatea/cpx)
-[![Dependency Status](https://dependencyci.com/github/mysticatea/cpx/badge)](https://dependencyci.com/github/mysticatea/cpx)
+[![codecov](https://codecov.io/gh/mysticatea/cpx/branch/master/graph/badge.svg)](https://codecov.io/gh/mysticatea/cpx)
 [![Dependency Status](https://david-dm.org/mysticatea/cpx.svg)](https://david-dm.org/mysticatea/cpx)
 
 Copy file globs, watching for changes.
@@ -161,3 +161,4 @@ There are some npm-scripts to help developments.
 - `npm run clean` - Delete directories (folders) which are created by other commands.
 - `npm run lint` - Run ESLint.
 - `npm run watch` - Run tests (not collect coverage) when each file was modified.
+- `npm run open-coverage` - Open the coverage report of the last `npm test` command with web browser.
