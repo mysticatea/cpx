@@ -232,15 +232,10 @@ describe("The copy method", () => {
         function verifyFiles() {
             const srcStat = statSync("./LICENSE")
             const dstStat = statSync("./test-ws/LICENSE")
+            const srcMtime = Math.floor(srcStat.mtime.getTime() / 1000)
+            const dstMtime = Math.floor(dstStat.mtime.getTime() / 1000)
 
-            if (process.platform === "win32") {
-                const srcMtime = Math.floor(srcStat.mtime.getTime() / 1000)
-                const dstMtime = Math.floor(dstStat.mtime.getTime() / 1000)
-                assert(srcMtime !== dstMtime)
-            }
-            else {
-                assert(srcStat.mtime.getTime() !== dstStat.mtime.getTime())
-            }
+            assert(srcMtime !== dstMtime)
         }
 
         it("lib async version.", (done) => {
@@ -274,17 +269,12 @@ describe("The copy method", () => {
         function verifyFiles() {
             const srcStat = statSync("./LICENSE")
             const dstStat = statSync("./test-ws/LICENSE")
+            const srcMtime = Math.floor(srcStat.mtime.getTime() / 1000)
+            const dstMtime = Math.floor(dstStat.mtime.getTime() / 1000)
 
             assert(srcStat.uid === dstStat.uid)
             assert(srcStat.gid === dstStat.gid)
-            if (process.platform === "win32") {
-                const srcMtime = Math.floor(srcStat.mtime.getTime() / 1000)
-                const dstMtime = Math.floor(dstStat.mtime.getTime() / 1000)
-                assert(srcMtime === dstMtime)
-            }
-            else {
-                assert(srcStat.mtime.getTime() === dstStat.mtime.getTime())
-            }
+            assert(srcMtime === dstMtime)
         }
 
         it("lib async version.", (done) => {
