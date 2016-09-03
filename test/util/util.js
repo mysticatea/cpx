@@ -86,7 +86,7 @@ exports.content = function content(path) {
  * @returns {child_process.ChildProcess} A child process object.
  */
 exports.execCommand = function execCommand(args) {
-    return exec(`babel-node src/bin/index.js ${args}`)
+    return exec(`babel-node -- src/bin/index.js ${args}`)
 }
 
 /**
@@ -95,5 +95,5 @@ exports.execCommand = function execCommand(args) {
  * @returns {void}
  */
 exports.execCommandSync = function execCommandSync(args) {
-    execSync(`babel-node src/bin/index.js ${args}`)
+    return execSync(`babel-node -- src/bin/index.js ${args}`)
 }

@@ -45,11 +45,15 @@ if (unknowns.length > 0) {
 
 //------------------------------------------------------------------------------
 // Main.
-if (args.help || source == null || outDir == null || args._.length > 2) {
+if (args.help) {
     require("./help")()
 }
 else if (args.version) {
     require("./version")()
+}
+else if (source == null || outDir == null || args._.length > 2) {
+    require("./help")()
+    process.exit(1)
 }
 else {
     require("./main")(source, outDir, args)
