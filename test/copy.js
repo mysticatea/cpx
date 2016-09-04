@@ -170,6 +170,94 @@ describe("The copy method", () => {
         })
     })
 
+    describe("should copy specified empty directories with globs when `--include-empty-dirs` option was given:", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/b/pen.txt": "A pen",
+                "test-ws/a/c": null,
+            })
+        })
+        afterEach(() => {
+            teardownTestDir("test-ws")
+        })
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/a/hello.txt") === "Hello")
+            assert(content("test-ws/a/b/pen.txt") === "A pen")
+            assert(statSync("test-ws/a/c").isDirectory())
+            assert(content("test-ws/b/hello.txt") === "Hello")
+            assert(content("test-ws/b/b/pen.txt") === "A pen")
+            assert(statSync("test-ws/b/c").isDirectory())
+        }
+
+        it("lib async version.", (done) => {
+            cpx.copy("test-ws/a/**", "test-ws/b", {includeEmptyDirs: true}, (err) => {
+                assert(err === null)
+                verifyFiles()
+                done()
+            })
+        })
+
+        it("lib sync version.", () => {
+            cpx.copySync("test-ws/a/**", "test-ws/b", {includeEmptyDirs: true})
+            verifyFiles()
+        })
+
+        it("command version.", () => {
+            execCommandSync("\"test-ws/a/**\" test-ws/b --include-empty-dirs")
+            verifyFiles()
+        })
+    })
+
+    describe("should not copy specified empty directories with globs when `--include-empty-dirs` option was not given:", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/b/pen.txt": "A pen",
+                "test-ws/a/c": null,
+            })
+        })
+        afterEach(() => {
+            teardownTestDir("test-ws")
+        })
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/a/hello.txt") === "Hello")
+            assert(content("test-ws/a/b/pen.txt") === "A pen")
+            assert(statSync("test-ws/a/c").isDirectory())
+            assert(content("test-ws/b/hello.txt") === "Hello")
+            assert(content("test-ws/b/b/pen.txt") === "A pen")
+            assert.throws(() => statSync("test-ws/b/c"), /ENOENT/)
+        }
+
+        it("lib async version.", (done) => {
+            cpx.copy("test-ws/a/**", "test-ws/b", (err) => {
+                assert(err === null)
+                verifyFiles()
+                done()
+            })
+        })
+
+        it("lib sync version.", () => {
+            cpx.copySync("test-ws/a/**", "test-ws/b")
+            verifyFiles()
+        })
+
+        it("command version.", () => {
+            execCommandSync("\"test-ws/a/**\" test-ws/b")
+            verifyFiles()
+        })
+    })
+
     describe("should copy specified files with globs when `--preserve` option was given:", () => {
         beforeEach(() => {
             setupTestDir({

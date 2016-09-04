@@ -34,7 +34,9 @@ Options:
     -C, --clean               Clean files that matches <source> like pattern in
                               <dest> directory before the first copying.
     -L, --dereference         Follow symbolic links when copying from them.
-    -h, --help                Print usage information
+    -h, --help                Print usage information.
+        --include-empty-dirs  The flag to copy empty directories which is
+                              matched with the glob.
     -p, --preserve            The flag to copy attributes of files.
                               This attributes are uid, gid, atime, and mtime.
     -t, --transform <name>    A module name to transform each file. cpx lookups
@@ -42,7 +44,7 @@ Options:
     -u, --update              The flag to not overwrite files on destination if
                               the source file is older.
     -v, --verbose             Print copied/removed files.
-    -V, --version             Print the version number
+    -V, --version             Print the version number.
     -w, --watch               Watch for files that matches <source>, and copy
                               the file to <dest> every changing.
 ```
@@ -101,6 +103,7 @@ cpx.copy(source, dest, callback)
 - **options** `{object}`
   - **options.clean** `{boolean}` -- The flag to remove files that copied on past before copy.
   - **options.dereference** `{boolean}` -- The flag to follow symbolic links when copying from them.
+  - **options.includeEmptyDirs** `{boolean}` -- The flag to copy empty directories which is matched with the glob.
   - **options.preserve** `{boolean}` -- The flag to copy uid, gid, atime, and mtime of files.
   - **options.transform** `{((filepath: string) => stream.Transform)[]}` -- Functions that creates a `stream.Transform` object to transform each copying file.
   - **options.update** `{boolean}` -- The flag to not overwrite files on destination if the source file is older.

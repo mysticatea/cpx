@@ -8,6 +8,7 @@
 
 const {Buffer} = require("safe-buffer")
 const fs = require("fs")
+const mkdirSync = require("mkdirp").sync
 const MAX_BUFFER = 2048
 
 /**
@@ -66,7 +67,12 @@ module.exports = function copySync(src, dst, {preserve, update}) {
         }
     }
 
-    copyBodySync(src, dst)
+    if (stat.isDirectory()) {
+        mkdirSync(dst)
+    }
+    else {
+        copyBodySync(src, dst)
+    }
     fs.chmodSync(dst, stat.mode)
 
     if (preserve) {

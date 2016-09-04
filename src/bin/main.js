@@ -93,6 +93,7 @@ module.exports = function main(source, outDir, args) {
         {
             transform: mergedTransformFactories,
             dereference: args.dereference,
+            includeEmptyDirs: args.includeEmptyDirs,
             preserve: args.preserve,
             update: args.update,
         }

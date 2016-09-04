@@ -7,6 +7,7 @@
 "use strict"
 
 const fs = require("fs")
+const mkdir = require("mkdirp")
 const Queue = require("./queue")
 
 /**
@@ -117,14 +118,28 @@ module.exports = function copy(
         }))
     }
 
-    q.push(next => copyBody(src, dst, transformFactories, (err) => {
-        if (err) {
-            cb(err)
+    q.push(next => {
+        if (stat.isDirectory()) {
+            mkdir(dst, (err) => {
+                if (err) {
+                    cb(err)
+                }
+                else {
+                    next()
+                }
+            })
         }
         else {
-            next()
+            copyBody(src, dst, transformFactories, (err) => {
+                if (err) {
+                    cb(err)
+                }
+                else {
+                    next()
+                }
+            })
         }
-    }))
+    })
     q.push(next => fs.chmod(dst, stat.mode, (err) => {
         if (err) {
             cb(err)

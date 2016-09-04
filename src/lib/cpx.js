@@ -7,7 +7,7 @@
 "use strict"
 
 const {EventEmitter} = require("events")
-const {unlink, unlinkSync, rmdir, rmdirSync} = require("fs")
+const fs = require("fs")
 const {
     dirname,
     resolve: resolvePath,
@@ -27,6 +27,7 @@ const Queue = require("./queue")
 
 const BASE_DIR = Symbol("baseDir")
 const DEREFERENCE = Symbol("dereference")
+const INCLUDE_EMPTY_DIRS = Symbol("include-empty-dirs")
 const OUT_DIR = Symbol("outDir")
 const PRESERVE = Symbol("preserve")
 const SOURCE = Symbol("source")
@@ -64,7 +65,7 @@ function normalizePath(path) {
  * @returns {void}
  */
 function doAllSimply(cpx, pattern, action) {
-    new Glob(pattern, {nodir: true, silent: true})
+    new Glob(pattern, {nodir: !cpx.includeEmptyDirs, silent: true})
         .on("match", action.bind(cpx))
 }
 
@@ -98,26 +99,33 @@ function doAll(cpx, pattern, action, cb) {
         }
     }
 
-    new Glob(pattern, {nodir: true, silent: true, follow: cpx.dereference})
-        .on("match", (path) => {
-            if (lastError != null) {
-                return
-            }
+    new Glob(
+        pattern,
+        {
+            nodir: !cpx.includeEmptyDirs,
+            silent: true,
+            follow: cpx.dereference,
+        }
+    )
+    .on("match", (path) => {
+        if (lastError != null) {
+            return
+        }
 
-            count += 1
-            action.call(cpx, path, (err) => {
-                count -= 1
-                lastError = lastError || err
-                cbIfEnd()
-            })
-        })
-        .on("end", () => {
-            done = true
+        count += 1
+        action.call(cpx, path, (err) => {
+            count -= 1
+            lastError = lastError || err
             cbIfEnd()
         })
-        .on("error", (err) => {
-            lastError = lastError || err
-        })
+    })
+    .on("end", () => {
+        done = true
+        cbIfEnd()
+    })
+    .on("error", (err) => {
+        lastError = lastError || err
+    })
 }
 
 module.exports = class Cpx extends EventEmitter {
@@ -136,6 +144,7 @@ module.exports = class Cpx extends EventEmitter {
         this[SOURCE] = normalizePath(source)
         this[OUT_DIR] = normalizePath(outDir)
         this[DEREFERENCE] = Boolean(options.dereference)
+        this[INCLUDE_EMPTY_DIRS] = Boolean(options.includeEmptyDirs)
         this[PRESERVE] = Boolean(options.preserve)
         this[TRANSFORM] = [].concat(options.transform).filter(Boolean)
         this[UPDATE] = Boolean(options.update)
@@ -170,6 +179,14 @@ module.exports = class Cpx extends EventEmitter {
      */
     get dereference() {
         return this[DEREFERENCE]
+    }
+
+    /**
+     * The flag to copy empty directories which is matched with the glob.
+     * @type {boolean}
+     */
+    get includeEmptyDirs() {
+        return this[INCLUDE_EMPTY_DIRS]
     }
 
     /**
@@ -275,18 +292,38 @@ module.exports = class Cpx extends EventEmitter {
         assert(cb == null || typeof cb === "function")
 
         let lastError = null
+        let stat = null
         this[QUEUE].push(next => {
-            unlink(path, (err) => {
-                if (err == null) {
-                    this.emit("remove", {path})
-                }
-
+            fs.stat(path, (err, result) => {
                 lastError = err
+                stat = result
                 next()
             })
         })
         this[QUEUE].push(next => {
-            rmdir(dirname(path), () => {
+            if (stat && stat.isDirectory()) {
+                fs.rmdir(path, (err) => {
+                    if (err == null) {
+                        this.emit("remove", {path})
+                    }
+
+                    lastError = err
+                    next()
+                })
+            }
+            else {
+                fs.unlink(path, (err) => {
+                    if (err == null) {
+                        this.emit("remove", {path})
+                    }
+
+                    lastError = err
+                    next()
+                })
+            }
+        })
+        this[QUEUE].push(next => {
+            fs.rmdir(dirname(path), () => {
                 next()
                 if (cb != null) {
                     cb(lastError)
@@ -331,16 +368,37 @@ module.exports = class Cpx extends EventEmitter {
             return
         }
 
-        for (const path of searchSync(dest, {nodir: true, silent: true})) {
-            unlinkSync(path)
+        for (const path of searchSync(
+            dest,
+            {
+                nodir: !this.includeEmptyDirs,
+                silent: true,
+            }
+        )) {
             try {
-                rmdirSync(dirname(path))
+                const stat = fs.statSync(path)
+                if (stat.isDirectory()) {
+                    fs.rmdirSync(path)
+                }
+                else {
+                    fs.unlinkSync(path)
+                }
+            }
+            catch (err) {
+                if (err.code !== "ENOENT") {
+                    throw err
+                }
+            }
+
+            try {
+                fs.rmdirSync(dirname(path))
             }
             catch (err) {
                 if (err.code !== "ENOTEMPTY") {
                     throw err
                 }
             }
+
             this.emit("remove", {path})
         }
     }
@@ -374,7 +432,11 @@ module.exports = class Cpx extends EventEmitter {
 
         const srcPaths = searchSync(
             this.source,
-            {nodir: true, silent: true, follow: this.dereference}
+            {
+                nodir: !this.includeEmptyDirs,
+                silent: true,
+                follow: this.dereference,
+            }
         )
         srcPaths.forEach(srcPath => {
             const dstPath = this.src2dst(srcPath)
@@ -406,11 +468,37 @@ module.exports = class Cpx extends EventEmitter {
         }
 
         const m = new Minimatch(this.source)
+
         let firstCopyCount = 0
         let ready = false
         const fireReadyIfReady = () => {
             if (ready && firstCopyCount === 0) {
                 this.emit("watch-ready")
+            }
+        }
+
+        const onAdded = (path) => {
+            const normalizedPath = normalizePath(path)
+            if (m.match(normalizedPath)) {
+                if (ready) {
+                    this.enqueueCopy(normalizedPath)
+                }
+                else {
+                    firstCopyCount += 1
+                    this.enqueueCopy(normalizedPath, () => {
+                        firstCopyCount -= 1
+                        fireReadyIfReady()
+                    })
+                }
+            }
+        }
+        const onRemoved = (path) => {
+            const normalizedPath = normalizePath(path)
+            if (m.match(normalizedPath)) {
+                const dstPath = this.src2dst(normalizedPath)
+                if (dstPath !== normalizedPath) {
+                    this.enqueueRemove(dstPath)
+                }
             }
         }
 
@@ -422,31 +510,12 @@ module.exports = class Cpx extends EventEmitter {
                 followSymlinks: this.dereference,
             }
         )
+
         this[WATCHER]
-            .on("add", (path) => {
-                const normalizedPath = normalizePath(path)
-                if (m.match(normalizedPath)) {
-                    if (ready) {
-                        this.enqueueCopy(normalizedPath)
-                    }
-                    else {
-                        firstCopyCount += 1
-                        this.enqueueCopy(normalizedPath, () => {
-                            firstCopyCount -= 1
-                            fireReadyIfReady()
-                        })
-                    }
-                }
-            })
-            .on("unlink", (path) => {
-                const normalizedPath = normalizePath(path)
-                if (m.match(normalizedPath)) {
-                    const dstPath = this.src2dst(normalizedPath)
-                    if (dstPath !== normalizedPath) {
-                        this.enqueueRemove(dstPath)
-                    }
-                }
-            })
+            .on("add", onAdded)
+            .on("addDir", onAdded)
+            .on("unlink", onRemoved)
+            .on("unlinkDir", onRemoved)
             .on("change", (path) => {
                 const normalizedPath = normalizePath(path)
                 if (m.match(normalizedPath)) {

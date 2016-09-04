@@ -6,9 +6,11 @@
 
 "use strict"
 
-const {symlinkSync} = require("fs")
+const {symlinkSync, statSync} = require("fs")
 const {resolve: resolvePath} = require("path")
 const assert = require("power-assert")
+const mkdirSync = require("mkdirp").sync
+const rimrafSync = require("rimraf").sync
 const cpx = require("../src/lib")
 const {
     setupTestDir,
@@ -304,9 +306,9 @@ describe("The watch method", () => {
                 done()
             })
         })
-    });
+    })
 
-    [
+    ;[
         {
             description: "should copy on file added:",
             initialFiles: {"test-ws/a/hello.txt": "Hello"},
@@ -420,6 +422,89 @@ describe("The watch method", () => {
                         verifyFiles()
                         done()
                     })
+                })
+            })
+        })
+    })
+
+    describe("should copy it when an empty directory is added when '--include-empty-dirs' option was given:", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/b/hello.txt": "Hello",
+            })
+        })
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/b/hello.txt") === "Hello")
+            assert(content("test-ws/b/b/hello.txt") === "Hello")
+            assert(statSync("test-ws/b/c").isDirectory())
+        }
+
+        it("lib version.", (done) => {
+            watcher = cpx.watch("test-ws/a/**", "test-ws/b", {includeEmptyDirs: true})
+            waitForReady(() => {
+                mkdirSync("test-ws/a/c")
+                waitForCopy(() => {
+                    verifyFiles()
+                    done()
+                })
+            })
+        })
+
+        it("command version.", (done) => {
+            command = execCommand("\"test-ws/a/**\" test-ws/b --include-empty-dirs --watch --verbose")
+            waitForReady(() => {
+                mkdirSync("test-ws/a/c")
+                waitForCopy(() => {
+                    verifyFiles()
+                    done()
+                })
+            })
+        })
+    })
+
+    describe("should remove it on destination when an empty directory is removed when '--include-empty-dirs' option was given:", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/b/hello.txt": "Hello",
+                "test-ws/a/c": null,
+            })
+        })
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/b/hello.txt") === "Hello")
+            assert(content("test-ws/b/b/hello.txt") === "Hello")
+            assert.throws(() => statSync("test-ws/b/c"), /ENOENT/)
+        }
+
+        it("lib version.", (done) => {
+            watcher = cpx.watch("test-ws/a/**", "test-ws/b", {includeEmptyDirs: true})
+            waitForReady(() => {
+                rimrafSync("test-ws/a/c")
+                waitForRemove(() => {
+                    verifyFiles()
+                    done()
+                })
+            })
+        })
+
+        it("command version.", (done) => {
+            command = execCommand("\"test-ws/a/**\" test-ws/b --include-empty-dirs --watch --verbose")
+            waitForReady(() => {
+                rimrafSync("test-ws/a/c")
+                waitForRemove(() => {
+                    verifyFiles()
+                    done()
                 })
             })
         })

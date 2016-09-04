@@ -51,7 +51,12 @@ exports.removeFile = function removeFile(path) {
  */
 exports.setupTestDir = function setupTestDir(dataset) {
     for (const path in dataset) {
-        writeFile(path, dataset[path])
+        if (dataset[path] == null) {
+            mkdirSync(path)
+        }
+        else {
+            writeFile(path, dataset[path])
+        }
     }
 }
 
