@@ -28,6 +28,7 @@ const Queue = require("./queue")
 const BASE_DIR = Symbol("baseDir")
 const DEREFERENCE = Symbol("dereference")
 const INCLUDE_EMPTY_DIRS = Symbol("include-empty-dirs")
+const INITIAL_COPY = Symbol("initialCopy")
 const OUT_DIR = Symbol("outDir")
 const PRESERVE = Symbol("preserve")
 const SOURCE = Symbol("source")
@@ -145,6 +146,9 @@ module.exports = class Cpx extends EventEmitter {
         this[OUT_DIR] = normalizePath(outDir)
         this[DEREFERENCE] = Boolean(options.dereference)
         this[INCLUDE_EMPTY_DIRS] = Boolean(options.includeEmptyDirs)
+        this[INITIAL_COPY] =
+            options.initialCopy === undefined ||
+            Boolean(options.initialCopy)
         this[PRESERVE] = Boolean(options.preserve)
         this[TRANSFORM] = [].concat(options.transform).filter(Boolean)
         this[UPDATE] = Boolean(options.update)
@@ -187,6 +191,14 @@ module.exports = class Cpx extends EventEmitter {
      */
     get includeEmptyDirs() {
         return this[INCLUDE_EMPTY_DIRS]
+    }
+
+    /**
+     * The flag to copy files at the initial time of watch.
+     * @type {boolean}
+     */
+    get initialCopy() {
+        return this[INITIAL_COPY]
     }
 
     /**
@@ -483,7 +495,7 @@ module.exports = class Cpx extends EventEmitter {
                 if (ready) {
                     this.enqueueCopy(normalizedPath)
                 }
-                else {
+                else if (this.initialCopy) {
                     firstCopyCount += 1
                     this.enqueueCopy(normalizedPath, () => {
                         firstCopyCount -= 1

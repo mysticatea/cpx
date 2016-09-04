@@ -35,8 +35,10 @@ Options:
                               <dest> directory before the first copying.
     -L, --dereference         Follow symbolic links when copying from them.
     -h, --help                Print usage information.
-        --include-empty-dirs  The flag to copy empty directories which is
+    --include-empty-dirs      The flag to copy empty directories which is
                               matched with the glob.
+    --no-initial              The flag to not copy at the initial time of watch.
+                              Use together '--watch' option.
     -p, --preserve            The flag to copy attributes of files.
                               This attributes are uid, gid, atime, and mtime.
     -t, --transform <name>    A module name to transform each file. cpx lookups
@@ -101,12 +103,13 @@ cpx.copy(source, dest, callback)
 - **source** `{string}` -- A file glob of copy targets.
 - **dest** `{string}` -- A file path of a destination directory.
 - **options** `{object}`
-  - **options.clean** `{boolean}` -- The flag to remove files that copied on past before copy.
-  - **options.dereference** `{boolean}` -- The flag to follow symbolic links when copying from them.
-  - **options.includeEmptyDirs** `{boolean}` -- The flag to copy empty directories which is matched with the glob.
-  - **options.preserve** `{boolean}` -- The flag to copy uid, gid, atime, and mtime of files.
+  - **options.clean** `{boolean}` -- The flag to remove files that copied on past before copy. Default: `false`.
+  - **options.dereference** `{boolean}` -- The flag to follow symbolic links when copying from them. Default: `false`.
+  - **options.includeEmptyDirs** `{boolean}` -- The flag to copy empty directories which is matched with the glob. Default: `false`.
+  - **options.initialCopy** `{boolean}` -- The flag to not copy at the initial time of watch. This is for `cpx.watch()`. Default: `true`.
+  - **options.preserve** `{boolean}` -- The flag to copy uid, gid, atime, and mtime of files. Default: `false`.
   - **options.transform** `{((filepath: string) => stream.Transform)[]}` -- Functions that creates a `stream.Transform` object to transform each copying file.
-  - **options.update** `{boolean}` -- The flag to not overwrite files on destination if the source file is older.
+  - **options.update** `{boolean}` -- The flag to not overwrite files on destination if the source file is older. Default: `false`.
 - **callback** `{(err: Error|null) => void}` -- A function that is called at done.
 
 Copy files that matches with `source` glob to `dest` directory.

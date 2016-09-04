@@ -308,6 +308,52 @@ describe("The watch method", () => {
         })
     })
 
+    describe("should not copy specified files with globs at first when `--no-initial` option was given:", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/untachable.txt": "untachable",
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/b/this-is.txt": "A pen",
+                "test-ws/a/b/that-is.txt": "A note",
+                "test-ws/a/b/no-copy.dat": "no-copy",
+            })
+        })
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/untachable.txt") === "untachable")
+            assert(content("test-ws/a/hello.txt") === "Hello")
+            assert(content("test-ws/a/b/this-is.txt") === "A pen")
+            assert(content("test-ws/a/b/that-is.txt") === "A note")
+            assert(content("test-ws/a/b/no-copy.dat") === "no-copy")
+            assert(content("test-ws/b/untachable.txt") === null)
+            assert(content("test-ws/b/hello.txt") === null)
+            assert(content("test-ws/b/b/this-is.txt") === null)
+            assert(content("test-ws/b/b/that-is.txt") === null)
+            assert(content("test-ws/b/b/no-copy.dat") === null)
+        }
+
+        it("lib version.", (done) => {
+            watcher = cpx.watch("test-ws/a/**/*.txt", "test-ws/b", {initialCopy: false})
+            watcher.on("watch-ready", () => {
+                // Done the first copies.
+                verifyFiles()
+                done()
+            })
+        })
+
+        it("command version.", (done) => {
+            command = execCommand("\"test-ws/a/**/*.txt\" test-ws/b --no-initial --watch --verbose")
+            waitForReady(() => {
+                verifyFiles()
+                done()
+            })
+        })
+    })
+
     ;[
         {
             description: "should copy on file added:",
@@ -503,6 +549,47 @@ describe("The watch method", () => {
             waitForReady(() => {
                 rimrafSync("test-ws/a/c")
                 waitForRemove(() => {
+                    verifyFiles()
+                    done()
+                })
+            })
+        })
+    })
+
+    describe("should copy it when a file is added even if '--no-initial' option was given:", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/b/hello.txt": "Hello",
+            })
+        })
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/b/hello.txt") === null)
+            assert(content("test-ws/b/b/hello.txt") === null)
+            assert(content("test-ws/b/added.txt") === "added")
+        }
+
+        it("lib version.", (done) => {
+            watcher = cpx.watch("test-ws/a/**", "test-ws/b", {initialCopy: false})
+            waitForReady(() => {
+                writeFile("test-ws/a/added.txt", "added")
+                waitForCopy(() => {
+                    verifyFiles()
+                    done()
+                })
+            })
+        })
+
+        it("command version.", (done) => {
+            command = execCommand("\"test-ws/a/**\" test-ws/b --no-initial --watch --verbose")
+            waitForReady(() => {
+                writeFile("test-ws/a/added.txt", "added")
+                waitForCopy(() => {
                     verifyFiles()
                     done()
                 })

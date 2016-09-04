@@ -13,46 +13,47 @@ const subarg = require("subarg")
 
 //------------------------------------------------------------------------------
 // Parse arguments.
-const OPTIONS = {
-    c: "command",
-    C: "clean",
-    h: "help",
-    includeEmptyDirs: "include-empty-dirs",
-    L: "dereference",
-    p: "preserve",
-    t: "transform",
-    u: "update",
-    v: "verbose",
-    V: "version",
-    w: "watch",
-}
+const unknowns = new Set()
 const args = subarg(process.argv.slice(2), {
+    alias: {
+        c: "command",
+        C: "clean",
+        h: "help",
+        includeEmptyDirs: "include-empty-dirs",
+        L: "dereference",
+        p: "preserve",
+        t: "transform",
+        u: "update",
+        v: "verbose",
+        V: "version",
+        w: "watch",
+    },
     boolean: [
         "clean",
         "dereference",
         "help",
         "include-empty-dirs",
+        "initial",
         "preserve",
         "update",
         "verbose",
         "version",
         "watch",
     ],
-    alias: OPTIONS,
+    default: {initial: true},
+    unknown: (arg) => {
+        if (arg[0] === "-") {
+            unknowns.add(arg)
+        }
+    },
 })
 const source = args._[0]
 const outDir = args._[1]
 
 //------------------------------------------------------------------------------
 // Validate Options.
-const knowns = new Set(["_"])
-for (const key in OPTIONS) {
-    knowns.add(key)
-    knowns.add(OPTIONS[key])
-}
-const unknowns = Object.keys(args).filter(key => !knowns.has(key))
-if (unknowns.length > 0) {
-    console.error(`Unknown option(s): ${unknowns.join(", ")}`)
+if (unknowns.size > 0) {
+    console.error(`Unknown option(s): ${Array.from(unknowns).join(", ")}`)
     process.exit(1)
 }
 
