@@ -4,7 +4,6 @@
  * See LICENSE file in root directory for full license.
  */
 /* eslint no-console:0, no-process-exit:0, no-process-env:0 */
-
 "use strict"
 
 const {resolve: resolvePath} = require("path")
@@ -46,10 +45,10 @@ module.exports = function main(source, outDir, args) {
 
     //--------------------------------------------------------------------------
     // Resolve Transforms.
-    const ABS_OR_REL = /^[.\/]/
+    const ABS_OR_REL = /^[./]/
     const transforms = [].concat(args.transform)
         .filter(Boolean)
-        .map(arg => { // eslint-disable-line array-callback-return,consistent-return
+        .map(arg => {
             if (typeof arg === "string") {
                 return {name: arg, argv: null}
             }

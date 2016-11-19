@@ -6,7 +6,6 @@
  * See LICENSE file in root directory for full license.
  */
 /* eslint no-console:0, no-process-exit:0 */
-
 "use strict"
 
 const subarg = require("subarg")
