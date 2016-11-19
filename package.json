@@ -14,7 +14,7 @@
     "preversion": "run-s test build",
     "postversion": "git push && git push --tags",
     "clean": "rimraf .nyc_output bin coverage lib test-ws",
-    "lint": "if-node-version \">=4\" eslint src",
+    "lint": "if-node-version \">=4\" eslint src test",
     "prebuild": "npm run clean",
     "build": "cross-env NODE_ENV=production babel src --out-dir .",
     "pretest": "run-s clean lint",

@@ -3,7 +3,6 @@
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-
 "use strict"
 
 //------------------------------------------------------------------------------
@@ -28,7 +27,7 @@ const {exec: execSync} = require("shelljs")
  * @param {string} contentText - A text to write.
  * @returns {void}
  */
-const writeFile = exports.writeFile = function writeFile(path, contentText) {
+const writeFile = module.exports.writeFile = function writeFile(path, contentText) {
     mkdirSync(dirname(path))
     writeFileSync(path, contentText)
 }
@@ -39,7 +38,7 @@ const writeFile = exports.writeFile = function writeFile(path, contentText) {
  * @param {string} path - A path to write.
  * @returns {void}
  */
-exports.removeFile = function removeFile(path) {
+module.exports.removeFile = function removeFile(path) {
     rimrafSync(path)
 }
 
@@ -49,7 +48,7 @@ exports.removeFile = function removeFile(path) {
  * @param {object} dataset - Test data to write.
  * @returns {void}
  */
-exports.setupTestDir = function setupTestDir(dataset) {
+module.exports.setupTestDir = function setupTestDir(dataset) {
     for (const path in dataset) {
         if (dataset[path] == null) {
             mkdirSync(path)
@@ -66,7 +65,7 @@ exports.setupTestDir = function setupTestDir(dataset) {
  * @param {string} testRootPath - A path to write.
  * @returns {void}
  */
-exports.teardownTestDir = function teardownTestDir(testRootPath) {
+module.exports.teardownTestDir = function teardownTestDir(testRootPath) {
     rimrafSync(testRootPath)
 }
 
@@ -76,7 +75,7 @@ exports.teardownTestDir = function teardownTestDir(testRootPath) {
  * @param {string} path - A path to read.
  * @returns {string|null} The content of the file, or `null` if not found.
  */
-exports.content = function content(path) {
+module.exports.content = function content(path) {
     try {
         return readFileSync(path, {encoding: "utf8"})
     }
@@ -90,7 +89,7 @@ exports.content = function content(path) {
  * @param {string} args - Command arguments.
  * @returns {child_process.ChildProcess} A child process object.
  */
-exports.execCommand = function execCommand(args) {
+module.exports.execCommand = function execCommand(args) {
     return exec(`babel-node -- src/bin/index.js ${args}`)
 }
 
@@ -99,6 +98,6 @@ exports.execCommand = function execCommand(args) {
  * @param {string} args - Command arguments.
  * @returns {void}
  */
-exports.execCommandSync = function execCommandSync(args) {
+module.exports.execCommandSync = function execCommandSync(args) {
     return execSync(`babel-node -- src/bin/index.js ${args}`, {silent: true})
 }
