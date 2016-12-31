@@ -126,7 +126,7 @@ describe("The watch method", () => {
     describe("should copy specified files with globs at first:", () => {
         beforeEach(() => {
             setupTestDir({
-                "test-ws/untachable.txt": "untachable",
+                "test-ws/untouchable.txt": "untouchable",
                 "test-ws/a/hello.txt": "Hello",
                 "test-ws/a/b/this-is.txt": "A pen",
                 "test-ws/a/b/that-is.txt": "A note",
@@ -139,12 +139,12 @@ describe("The watch method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            assert(content("test-ws/untachable.txt") === "untachable")
+            assert(content("test-ws/untouchable.txt") === "untouchable")
             assert(content("test-ws/a/hello.txt") === "Hello")
             assert(content("test-ws/a/b/this-is.txt") === "A pen")
             assert(content("test-ws/a/b/that-is.txt") === "A note")
             assert(content("test-ws/a/b/no-copy.dat") === "no-copy")
-            assert(content("test-ws/b/untachable.txt") === null)
+            assert(content("test-ws/b/untouchable.txt") === null)
             assert(content("test-ws/b/hello.txt") === "Hello")
             assert(content("test-ws/b/b/this-is.txt") === "A pen")
             assert(content("test-ws/b/b/that-is.txt") === "A note")
@@ -214,7 +214,7 @@ describe("The watch method", () => {
     describe("should copy specified files with globs at first even if the glob starts with `./`:", () => {
         beforeEach(() => {
             setupTestDir({
-                "test-ws/untachable.txt": "untachable",
+                "test-ws/untouchable.txt": "untouchable",
                 "test-ws/a/hello.txt": "Hello",
                 "test-ws/a/b/this-is.txt": "A pen",
                 "test-ws/a/b/that-is.txt": "A note",
@@ -227,12 +227,12 @@ describe("The watch method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            assert(content("test-ws/untachable.txt") === "untachable")
+            assert(content("test-ws/untouchable.txt") === "untouchable")
             assert(content("test-ws/a/hello.txt") === "Hello")
             assert(content("test-ws/a/b/this-is.txt") === "A pen")
             assert(content("test-ws/a/b/that-is.txt") === "A note")
             assert(content("test-ws/a/b/no-copy.dat") === "no-copy")
-            assert(content("test-ws/b/untachable.txt") === null)
+            assert(content("test-ws/b/untouchable.txt") === null)
             assert(content("test-ws/b/hello.txt") === "Hello")
             assert(content("test-ws/b/b/this-is.txt") === "A pen")
             assert(content("test-ws/b/b/that-is.txt") === "A note")
@@ -260,7 +260,7 @@ describe("The watch method", () => {
     describe("should clean and copy specified file blobs at first when give clean option:", () => {
         beforeEach(() => {
             setupTestDir({
-                "test-ws/untachable.txt": "untachable",
+                "test-ws/untouchable.txt": "untouchable",
                 "test-ws/a/hello.txt": "Hello",
                 "test-ws/a/b/this-is.txt": "A pen",
                 "test-ws/a/b/that-is.txt": "A note",
@@ -275,12 +275,12 @@ describe("The watch method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            assert(content("test-ws/untachable.txt") === "untachable")
+            assert(content("test-ws/untouchable.txt") === "untouchable")
             assert(content("test-ws/a/hello.txt") === "Hello")
             assert(content("test-ws/a/b/this-is.txt") === "A pen")
             assert(content("test-ws/a/b/that-is.txt") === "A note")
             assert(content("test-ws/a/b/no-copy.dat") === "no-copy")
-            assert(content("test-ws/b/untachable.txt") === null)
+            assert(content("test-ws/b/untouchable.txt") === null)
             assert(content("test-ws/b/hello.txt") === "Hello")
             assert(content("test-ws/b/b/this-is.txt") === "A pen")
             assert(content("test-ws/b/b/that-is.txt") === "A note")
@@ -310,7 +310,7 @@ describe("The watch method", () => {
     describe("should not copy specified files with globs at first when `--no-initial` option was given:", () => {
         beforeEach(() => {
             setupTestDir({
-                "test-ws/untachable.txt": "untachable",
+                "test-ws/untouchable.txt": "untouchable",
                 "test-ws/a/hello.txt": "Hello",
                 "test-ws/a/b/this-is.txt": "A pen",
                 "test-ws/a/b/that-is.txt": "A note",
@@ -323,12 +323,12 @@ describe("The watch method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            assert(content("test-ws/untachable.txt") === "untachable")
+            assert(content("test-ws/untouchable.txt") === "untouchable")
             assert(content("test-ws/a/hello.txt") === "Hello")
             assert(content("test-ws/a/b/this-is.txt") === "A pen")
             assert(content("test-ws/a/b/that-is.txt") === "A note")
             assert(content("test-ws/a/b/no-copy.dat") === "no-copy")
-            assert(content("test-ws/b/untachable.txt") === null)
+            assert(content("test-ws/b/untouchable.txt") === null)
             assert(content("test-ws/b/hello.txt") === null)
             assert(content("test-ws/b/b/this-is.txt") === null)
             assert(content("test-ws/b/b/that-is.txt") === null)
