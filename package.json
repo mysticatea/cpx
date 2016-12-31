@@ -18,7 +18,7 @@
     "prebuild": "npm run clean",
     "build": "cross-env NODE_ENV=production babel src --out-dir .",
     "pretest": "run-s clean lint",
-    "test": "cross-env NODE_ENV=development nyc --require babel-register mocha test/*.js --timeout 60000",
+    "test": "cross-env NODE_ENV=development nyc mocha test/*.js --timeout 60000",
     "prewatch": "run-s clean lint",
     "watch": "cross-env NODE_ENV=development mocha test/*.js --compilers js:babel-register --timeout 60000 --watch --growl",
     "open-coverage": "nyc report -r lcov && opener coverage/lcov-report/index.html",
