@@ -22,7 +22,7 @@ describe("The copy method", () => {
     describe("should copy specified files with globs:", () => {
         beforeEach(() => {
             setupTestDir({
-                "test-ws/untachable.txt": "untachable",
+                "test-ws/untouchable.txt": "untouchable",
                 "test-ws/a/hello.txt": "Hello",
                 "test-ws/a/b/this-is.txt": "A pen",
                 "test-ws/a/b/that-is.txt": "A note",
@@ -38,12 +38,12 @@ describe("The copy method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            assert(content("test-ws/untachable.txt") === "untachable")
+            assert(content("test-ws/untouchable.txt") === "untouchable")
             assert(content("test-ws/a/hello.txt") === "Hello")
             assert(content("test-ws/a/b/this-is.txt") === "A pen")
             assert(content("test-ws/a/b/that-is.txt") === "A note")
             assert(content("test-ws/a/b/no-copy.dat") === "no-copy")
-            assert(content("test-ws/b/untachable.txt") === null)
+            assert(content("test-ws/b/untouchable.txt") === null)
             assert(content("test-ws/b/hello.txt") === "Hello")
             assert(content("test-ws/b/b/this-is.txt") === "A pen")
             assert(content("test-ws/b/b/that-is.txt") === "A note")
@@ -72,7 +72,7 @@ describe("The copy method", () => {
     describe("should clean and copy specified files with globs when give clean option:", () => {
         beforeEach(() => {
             setupTestDir({
-                "test-ws/untachable.txt": "untachable",
+                "test-ws/untouchable.txt": "untouchable",
                 "test-ws/a/hello.txt": "Hello",
                 "test-ws/a/b/this-is.txt": "A pen",
                 "test-ws/a/b/that-is.txt": "A note",
@@ -90,12 +90,12 @@ describe("The copy method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            assert(content("test-ws/untachable.txt") === "untachable")
+            assert(content("test-ws/untouchable.txt") === "untouchable")
             assert(content("test-ws/a/hello.txt") === "Hello")
             assert(content("test-ws/a/b/this-is.txt") === "A pen")
             assert(content("test-ws/a/b/that-is.txt") === "A note")
             assert(content("test-ws/a/b/no-copy.dat") === "no-copy")
-            assert(content("test-ws/b/untachable.txt") === null)
+            assert(content("test-ws/b/untouchable.txt") === null)
             assert(content("test-ws/b/hello.txt") === "Hello")
             assert(content("test-ws/b/b/this-is.txt") === "A pen")
             assert(content("test-ws/b/b/that-is.txt") === "A note")
@@ -260,7 +260,7 @@ describe("The copy method", () => {
     describe("should copy specified files with globs when `--preserve` option was given:", () => {
         beforeEach(() => {
             setupTestDir({
-                "test-ws/untachable.txt": "untachable",
+                "test-ws/untouchable.txt": "untouchable",
                 "test-ws/a/hello.txt": "Hello",
                 "test-ws/a/b/this-is.txt": "A pen",
                 "test-ws/a/b/that-is.txt": "A note",
@@ -276,12 +276,12 @@ describe("The copy method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            assert(content("test-ws/untachable.txt") === "untachable")
+            assert(content("test-ws/untouchable.txt") === "untouchable")
             assert(content("test-ws/a/hello.txt") === "Hello")
             assert(content("test-ws/a/b/this-is.txt") === "A pen")
             assert(content("test-ws/a/b/that-is.txt") === "A note")
             assert(content("test-ws/a/b/no-copy.dat") === "no-copy")
-            assert(content("test-ws/b/untachable.txt") === null)
+            assert(content("test-ws/b/untouchable.txt") === null)
             assert(content("test-ws/b/hello.txt") === "Hello")
             assert(content("test-ws/b/b/this-is.txt") === "A pen")
             assert(content("test-ws/b/b/that-is.txt") === "A note")
