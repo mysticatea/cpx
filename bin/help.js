@@ -3,8 +3,11 @@
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-/* eslint no-console:0 */
 "use strict"
+
+//------------------------------------------------------------------------------
+// Exports
+//------------------------------------------------------------------------------
 
 /**
  * Prints the help text.

@@ -5,8 +5,16 @@
  */
 "use strict"
 
-const assert = require("power-assert")
-const {execCommandSync} = require("./util/util")
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
+
+const assert = require("assert")
+const execCommandSync = require("./util/util").execCommandSync
+
+//------------------------------------------------------------------------------
+// Test
+//------------------------------------------------------------------------------
 
 describe("[misc]", () => {
     it("should throw error if invalid option was given.", () => {

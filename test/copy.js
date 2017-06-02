@@ -5,18 +5,25 @@
  */
 "use strict"
 
-const {symlinkSync, statSync, utimesSync} = require("fs")
-const {resolve: resolvePath} = require("path")
-const assert = require("power-assert")
-const cpx = require("../src/lib")
-const {
-    setupTestDir,
-    teardownTestDir,
-    content,
-    execCommandSync,
-} = require("./util/util")
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
+
+const fs = require("fs")
+const path = require("path")
+const assert = require("assert")
+const cpx = require("..")
+const util = require("./util/util")
+const setupTestDir = util.setupTestDir
+const teardownTestDir = util.teardownTestDir
+const content = util.content
+const execCommandSync = util.execCommandSync
 const upperify = require("./util/upperify")
 const upperify2 = require("./util/upperify2")
+
+//------------------------------------------------------------------------------
+// Test
+//------------------------------------------------------------------------------
 
 describe("The copy method", () => {
     describe("should copy specified files with globs:", () => {
@@ -129,9 +136,9 @@ describe("The copy method", () => {
                 "test-ws/src/a/hello.txt": "Symlinked",
                 "test-ws/a/hello.txt": "Hello",
             })
-            symlinkSync(
-                resolvePath("test-ws/src"),
-                resolvePath("test-ws/a/link"),
+            fs.symlinkSync(
+                path.resolve("test-ws/src"),
+                path.resolve("test-ws/a/link"),
                 "junction"
             )
         })
@@ -188,10 +195,10 @@ describe("The copy method", () => {
         function verifyFiles() {
             assert(content("test-ws/a/hello.txt") === "Hello")
             assert(content("test-ws/a/b/pen.txt") === "A pen")
-            assert(statSync("test-ws/a/c").isDirectory())
+            assert(fs.statSync("test-ws/a/c").isDirectory())
             assert(content("test-ws/b/hello.txt") === "Hello")
             assert(content("test-ws/b/b/pen.txt") === "A pen")
-            assert(statSync("test-ws/b/c").isDirectory())
+            assert(fs.statSync("test-ws/b/c").isDirectory())
         }
 
         it("lib async version.", (done) => {
@@ -232,10 +239,10 @@ describe("The copy method", () => {
         function verifyFiles() {
             assert(content("test-ws/a/hello.txt") === "Hello")
             assert(content("test-ws/a/b/pen.txt") === "A pen")
-            assert(statSync("test-ws/a/c").isDirectory())
+            assert(fs.statSync("test-ws/a/c").isDirectory())
             assert(content("test-ws/b/hello.txt") === "Hello")
             assert(content("test-ws/b/b/pen.txt") === "A pen")
-            assert.throws(() => statSync("test-ws/b/c"), /ENOENT/)
+            assert.throws(() => fs.statSync("test-ws/b/c"), /ENOENT/)
         }
 
         it("lib async version.", (done) => {
@@ -317,8 +324,8 @@ describe("The copy method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            const srcStat = statSync("./LICENSE")
-            const dstStat = statSync("./test-ws/LICENSE")
+            const srcStat = fs.statSync("./LICENSE")
+            const dstStat = fs.statSync("./test-ws/LICENSE")
             const srcMtime = Math.floor(srcStat.mtime.getTime() / 1000)
             const dstMtime = Math.floor(dstStat.mtime.getTime() / 1000)
 
@@ -354,8 +361,8 @@ describe("The copy method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            const srcStat = statSync("./LICENSE")
-            const dstStat = statSync("./test-ws/LICENSE")
+            const srcStat = fs.statSync("./LICENSE")
+            const dstStat = fs.statSync("./test-ws/LICENSE")
             const srcMtime = Math.floor(srcStat.mtime.getTime() / 1000)
             const dstMtime = Math.floor(dstStat.mtime.getTime() / 1000)
 
@@ -394,10 +401,10 @@ describe("The copy method", () => {
 
             const older = Date.now() / 1000
             const newer = older + 1
-            utimesSync("test-ws/a.txt", newer, newer)
-            utimesSync("test-ws/b.txt", older, older)
-            utimesSync("test-ws/a/a.txt", older, older)
-            utimesSync("test-ws/a/b.txt", newer, newer)
+            fs.utimesSync("test-ws/a.txt", newer, newer)
+            fs.utimesSync("test-ws/b.txt", older, older)
+            fs.utimesSync("test-ws/a/a.txt", older, older)
+            fs.utimesSync("test-ws/a/b.txt", newer, newer)
         })
         afterEach(() => {
             teardownTestDir("test-ws")
@@ -444,10 +451,10 @@ describe("The copy method", () => {
 
             const older = Date.now() / 1000
             const newer = older + 1
-            utimesSync("test-ws/a.txt", newer, newer)
-            utimesSync("test-ws/b.txt", older, older)
-            utimesSync("test-ws/a/a.txt", older, older)
-            utimesSync("test-ws/a/b.txt", newer, newer)
+            fs.utimesSync("test-ws/a.txt", newer, newer)
+            fs.utimesSync("test-ws/b.txt", older, older)
+            fs.utimesSync("test-ws/a/a.txt", older, older)
+            fs.utimesSync("test-ws/a/b.txt", newer, newer)
         })
         afterEach(() => {
             teardownTestDir("test-ws")
@@ -653,6 +660,44 @@ describe("The copy method", () => {
 
         it("command version.", () => {
             execCommandSync("hello.txt test-ws")
+            verifyFiles()
+        })
+    })
+
+    describe("should copy specified files with globs even if there are parentheses:", () => {
+        beforeEach(() => {
+            setupTestDir({ //
+                "test-ws/a(paren)/hello.txt": "Hello",
+            })
+        })
+        afterEach(() => {
+            teardownTestDir("test-ws")
+        })
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/a(paren)/hello.txt") === "Hello")
+            assert(content("test-ws/b/hello.txt") === "Hello")
+        }
+
+        it("lib async version.", (done) => {
+            cpx.copy("test-ws/a(paren)/**/*.txt", "test-ws/b", (err) => {
+                assert(err === null)
+                verifyFiles()
+                done()
+            })
+        })
+
+        it("lib sync version.", () => {
+            cpx.copySync("test-ws/a(paren)/**/*.txt", "test-ws/b")
+            verifyFiles()
+        })
+
+        it("command version.", () => {
+            execCommandSync("\"test-ws/a(paren)/**/*.txt\" test-ws/b")
             verifyFiles()
         })
     })

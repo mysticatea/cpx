@@ -3,14 +3,13 @@
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-/* eslint no-var: off */
 "use strict"
 
 //------------------------------------------------------------------------------
 // Requirements
 //------------------------------------------------------------------------------
 
-var through = require("through")
+const through = require("through")
 
 //------------------------------------------------------------------------------
 // Helpers

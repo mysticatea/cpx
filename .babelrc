@@ -1,14 +1,4 @@
 {
-    "env": {
-        "production": {
-            "presets": ["es2015"],
-            "plugins": ["transform-runtime", "unassert"],
-            "sourceMaps": false
-        },
-        "development": {
-            "presets": ["es2015", "power-assert"],
-            "plugins": ["transform-runtime"],
-            "sourceMaps": "inline"
-        }
-    }
+    "presets": ["power-assert"],
+    "sourceMaps": "inline"
 }

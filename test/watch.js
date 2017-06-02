@@ -5,20 +5,27 @@
  */
 "use strict"
 
-const {symlinkSync, statSync} = require("fs")
-const {resolve: resolvePath} = require("path")
-const assert = require("power-assert")
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
+
+const fs = require("fs")
+const path = require("path")
+const assert = require("assert")
 const mkdirSync = require("mkdirp").sync
 const rimrafSync = require("rimraf").sync
-const cpx = require("../src/lib")
-const {
-    setupTestDir,
-    teardownTestDir,
-    content,
-    writeFile,
-    removeFile,
-    execCommand,
-} = require("./util/util")
+const cpx = require("..")
+const util = require("./util/util")
+const setupTestDir = util.setupTestDir
+const teardownTestDir = util.teardownTestDir
+const content = util.content
+const writeFile = util.writeFile
+const removeFile = util.removeFile
+const execCommand = util.execCommand
+
+//------------------------------------------------------------------------------
+// Test
+//------------------------------------------------------------------------------
 
 describe("The watch method", () => {
     let watcher = null
@@ -175,9 +182,9 @@ describe("The watch method", () => {
                 "test-ws/src/a/hello.txt": "Symlinked",
                 "test-ws/a/hello.txt": "Hello",
             })
-            symlinkSync(
-                resolvePath("test-ws/src"),
-                resolvePath("test-ws/a/link"),
+            fs.symlinkSync(
+                path.resolve("test-ws/src"),
+                path.resolve("test-ws/a/link"),
                 "junction"
             )
         })
@@ -353,11 +360,11 @@ describe("The watch method", () => {
         })
     })
 
-    ;[
+    const patterns = [
         {
             description: "should copy on file added:",
             initialFiles: {"test-ws/a/hello.txt": "Hello"},
-            action: () => {
+            action() {
                 writeFile("test-ws/a/b/added.txt", "added")
             },
             verify: {
@@ -369,7 +376,7 @@ describe("The watch method", () => {
         {
             description: "should do nothing on file added if unmatch file globs:",
             initialFiles: {"test-ws/a/hello.txt": "Hello"},
-            action: () => {
+            action() {
                 writeFile("test-ws/a/b/not-added.dat", "added")
                 // To fire copy event.
                 writeFile("test-ws/a/a.txt", "a")
@@ -383,7 +390,7 @@ describe("The watch method", () => {
         {
             description: "should copy on file changed:",
             initialFiles: {"test-ws/a/hello.txt": "Hello"},
-            action: () => {
+            action() {
                 writeFile("test-ws/a/hello.txt", "changed")
             },
             verify: {"test-ws/b/hello.txt": "changed"},
@@ -395,7 +402,7 @@ describe("The watch method", () => {
                 "test-ws/a/hello.txt": "Hello",
                 "test-ws/a/hello.dat": "Hello",
             },
-            action: () => {
+            action() {
                 writeFile("test-ws/a/hello.dat", "changed")
                 // To fire copy event.
                 writeFile("test-ws/a/a.txt", "a")
@@ -409,7 +416,7 @@ describe("The watch method", () => {
         {
             description: "should remove in the destination directory on file removed:",
             initialFiles: {"test-ws/a/hello.txt": "Hello"},
-            action: () => {
+            action() {
                 removeFile("test-ws/a/hello.txt")
             },
             verify: {"test-ws/b/hello.txt": null},
@@ -421,7 +428,7 @@ describe("The watch method", () => {
                 "test-ws/a/hello.txt": "Hello",
                 "test-ws/a/hello.dat": "Hello",
             },
-            action: () => {
+            action() {
                 removeFile("test-ws/a/hello.dat")
                 // To fire copy event.
                 writeFile("test-ws/a/a.txt", "a")
@@ -432,10 +439,11 @@ describe("The watch method", () => {
             },
             wait: waitForCopy,
         },
-    ].forEach(item => {
-        describe(item.description, () => {
+    ]
+    for (const pattern of patterns) {
+        describe(pattern.description, () => { //eslint-disable-line no-loop-func
             beforeEach(() => {
-                setupTestDir(item.initialFiles)
+                setupTestDir(pattern.initialFiles)
             })
 
             /**
@@ -443,16 +451,16 @@ describe("The watch method", () => {
              * @returns {void}
              */
             function verifyFiles() {
-                for (const file in item.verify) {
-                    assert(content(file) === item.verify[file])
+                for (const file of Object.keys(pattern.verify)) {
+                    assert(content(file) === pattern.verify[file])
                 }
             }
 
             it("lib version.", (done) => {
                 watcher = cpx.watch("test-ws/a/**/*.txt", "test-ws/b")
                 waitForReady(() => {
-                    item.action()
-                    item.wait(() => {
+                    pattern.action()
+                    pattern.wait(() => {
                         verifyFiles()
                         done()
                     })
@@ -462,15 +470,15 @@ describe("The watch method", () => {
             it("command version.", (done) => {
                 command = execCommand("\"test-ws/a/**/*.txt\" test-ws/b --watch --verbose")
                 waitForReady(() => {
-                    item.action()
-                    item.wait(() => {
+                    pattern.action()
+                    pattern.wait(() => {
                         verifyFiles()
                         done()
                     })
                 })
             })
         })
-    })
+    }
 
     describe("should copy it when an empty directory is added when '--include-empty-dirs' option was given:", () => {
         beforeEach(() => {
@@ -487,7 +495,7 @@ describe("The watch method", () => {
         function verifyFiles() {
             assert(content("test-ws/b/hello.txt") === "Hello")
             assert(content("test-ws/b/b/hello.txt") === "Hello")
-            assert(statSync("test-ws/b/c").isDirectory())
+            assert(fs.statSync("test-ws/b/c").isDirectory())
         }
 
         it("lib version.", (done) => {
@@ -529,7 +537,7 @@ describe("The watch method", () => {
         function verifyFiles() {
             assert(content("test-ws/b/hello.txt") === "Hello")
             assert(content("test-ws/b/b/hello.txt") === "Hello")
-            assert.throws(() => statSync("test-ws/b/c"), /ENOENT/)
+            assert.throws(() => fs.statSync("test-ws/b/c"), /ENOENT/)
         }
 
         it("lib version.", (done) => {
@@ -588,6 +596,45 @@ describe("The watch method", () => {
             command = execCommand("\"test-ws/a/**\" test-ws/b --no-initial --watch --verbose")
             waitForReady(() => {
                 writeFile("test-ws/a/added.txt", "added")
+                waitForCopy(() => {
+                    verifyFiles()
+                    done()
+                })
+            })
+        })
+    })
+
+    describe("should copy it when a file is modified even if there are parentheses in path:", () => {
+        beforeEach(() => {
+            setupTestDir({ //
+                "test-ws/a(paren)/hello.txt": "Hello",
+            })
+        })
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/a(paren)/hello.txt") === "Hello 2")
+            assert(content("test-ws/b/hello.txt") === "Hello 2")
+        }
+
+        it("lib version.", (done) => {
+            watcher = cpx.watch("test-ws/a(paren)/**", "test-ws/b", {initialCopy: false})
+            waitForReady(() => {
+                writeFile("test-ws/a(paren)/hello.txt", "Hello 2")
+                waitForCopy(() => {
+                    verifyFiles()
+                    done()
+                })
+            })
+        })
+
+        it("command version.", (done) => {
+            command = execCommand("\"test-ws/a(paren)/**\" test-ws/b --no-initial --watch --verbose")
+            waitForReady(() => {
+                writeFile("test-ws/a(paren)/hello.txt", "Hello 2")
                 waitForCopy(() => {
                     verifyFiles()
                     done()

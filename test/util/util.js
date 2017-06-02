@@ -9,12 +9,14 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-const {exec} = require("child_process")
-const {dirname} = require("path")
-const {readFileSync, writeFileSync} = require("fs")
-const {sync: mkdirSync} = require("mkdirp")
-const {sync: rimrafSync} = require("rimraf")
-const {exec: execSync} = require("shelljs")
+const exec = require("child_process").exec
+const dirname = require("path").dirname
+const fs = require("fs")
+const readFileSync = fs.readFileSync
+const writeFileSync = fs.writeFileSync
+const mkdirSync = require("mkdirp").sync
+const rimrafSync = require("rimraf").sync
+const execSync = require("shelljs").exec
 
 //------------------------------------------------------------------------------
 // Public Interface
@@ -49,7 +51,7 @@ module.exports.removeFile = function removeFile(path) {
  * @returns {void}
  */
 module.exports.setupTestDir = function setupTestDir(dataset) {
-    for (const path in dataset) {
+    for (const path of Object.keys(dataset)) {
         if (dataset[path] == null) {
             mkdirSync(path)
         }
@@ -90,7 +92,7 @@ module.exports.content = function content(path) {
  * @returns {child_process.ChildProcess} A child process object.
  */
 module.exports.execCommand = function execCommand(args) {
-    return exec(`babel-node -- src/bin/index.js ${args}`)
+    return exec(`node bin/index.js ${args}`)
 }
 
 /**
@@ -99,5 +101,5 @@ module.exports.execCommand = function execCommand(args) {
  * @returns {void}
  */
 module.exports.execCommandSync = function execCommandSync(args) {
-    return execSync(`babel-node -- src/bin/index.js ${args}`, {silent: true})
+    return execSync(`node bin/index.js ${args}`, {silent: true})
 }

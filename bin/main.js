@@ -3,18 +3,27 @@
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-/* eslint no-console:0, no-process-exit:0, no-process-env:0 */
 "use strict"
 
-const {resolve: resolvePath} = require("path")
-const {spawn} = require("child_process")
-const {sync: resolveModule} = require("resolve")
-const {parse: parseShellQuote} = require("shell-quote")
+//TODO: remove.
+/*eslint-disable no-process-exit, no-process-env */
+
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
+
+const resolvePath = require("path").resolve
+const spawn = require("child_process").spawn
+const resolveModule = require("resolve").sync
+const parseShellQuote = require("shell-quote").parse
 const duplexer = require("duplexer")
 const Cpx = require("../lib/cpx")
 
+//------------------------------------------------------------------------------
+// Exports
+//------------------------------------------------------------------------------
+
 module.exports = function main(source, outDir, args) {
-    //--------------------------------------------------------------------------
     // Resolve Command.
     const commands = [].concat(args.command)
         .filter(Boolean)
@@ -43,7 +52,6 @@ module.exports = function main(source, outDir, args) {
             }
         })
 
-    //--------------------------------------------------------------------------
     // Resolve Transforms.
     const ABS_OR_REL = /^[./]/
     const transforms = [].concat(args.transform)
@@ -67,7 +75,6 @@ module.exports = function main(source, outDir, args) {
             return (file) => createStream(file, item.argv)
         })
 
-    //--------------------------------------------------------------------------
     // Merge commands and transforms as same as order of process.argv.
     const C_OR_COMMAND = /^(?:-c|--command)$/
     const T_OR_TRANSFORM = /^(?:-t|--transform)$/
@@ -84,7 +91,6 @@ module.exports = function main(source, outDir, args) {
             })
             .filter(Boolean)
 
-    //--------------------------------------------------------------------------
     // Main.
     const cpx = new Cpx(
         source,
@@ -158,3 +164,5 @@ module.exports = function main(source, outDir, args) {
         })
     }
 }
+
+/*eslint-enable no-process-exit, no-process-env */

@@ -3,15 +3,14 @@
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-/* eslint no-var: off */
 "use strict"
 
 //------------------------------------------------------------------------------
 // Requirements
 //------------------------------------------------------------------------------
 
-var Transform = require("stream").Transform
-var inherits = require("util").inherits
+const Transform = require("stream").Transform
+const inherits = require("util").inherits
 
 //------------------------------------------------------------------------------
 // Helpers
@@ -28,7 +27,7 @@ inherits(Upperify, Transform)
 
 Object.defineProperties(Upperify.prototype, {
     _transform: {
-        value: function _transform(data, encoding, callback) {
+        value: function _transform(data, _encoding, callback) {
             callback(null, data.toString().toUpperCase())
         },
         configurable: true,

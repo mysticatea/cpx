@@ -1,16 +1,21 @@
 #!/usr/bin/env node
-
 /**
  * @author Toru Nagashima
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-/* eslint no-console:0, no-process-exit:0 */
 "use strict"
+
+//------------------------------------------------------------------------------
+// Requirements
+//------------------------------------------------------------------------------
 
 const subarg = require("subarg")
 
 //------------------------------------------------------------------------------
+// Main
+//------------------------------------------------------------------------------
+
 // Parse arguments.
 const unknowns = new Set()
 const args = subarg(process.argv.slice(2), {
@@ -40,7 +45,7 @@ const args = subarg(process.argv.slice(2), {
         "watch",
     ],
     default: {initial: true},
-    unknown: (arg) => {
+    unknown(arg) {
         if (arg[0] === "-") {
             unknowns.add(arg)
         }
@@ -49,14 +54,13 @@ const args = subarg(process.argv.slice(2), {
 const source = args._[0]
 const outDir = args._[1]
 
-//------------------------------------------------------------------------------
 // Validate Options.
 if (unknowns.size > 0) {
     console.error(`Unknown option(s): ${Array.from(unknowns).join(", ")}`)
-    process.exit(1)
+    process.exitCode = 1
+    return
 }
 
-//------------------------------------------------------------------------------
 // Main.
 if (args.help) {
     require("./help")()
@@ -66,7 +70,7 @@ else if (args.version) {
 }
 else if (source == null || outDir == null || args._.length > 2) {
     require("./help")()
-    process.exit(1)
+    process.exitCode = 1
 }
 else {
     require("./main")(source, outDir, args)

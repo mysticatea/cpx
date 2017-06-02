@@ -1,0 +1,7 @@
+{
+    "extends": ["mysticatea", "mysticatea/node"],
+    "plugins": ["node"],
+    "rules": {
+        "node/no-extraneous-require": "error"
+    }
+}
