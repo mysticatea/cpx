@@ -44,7 +44,7 @@
     "eslint": "^3.19.0",
     "eslint-config-mysticatea": "^10.0.0",
     "mocha": "^3.4.2",
-    "nyc": "^11.0.1",
+    "nyc": "11.0.1",
     "opener": "^1.4.3",
     "power-assert": "^1.4.2",
     "rimraf": "^2.6.1",
