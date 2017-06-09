@@ -11,11 +11,7 @@
 
 const exec = require("child_process").exec
 const dirname = require("path").dirname
-const fs = require("fs")
-const readFileSync = fs.readFileSync
-const writeFileSync = fs.writeFileSync
-const mkdirSync = require("mkdirp").sync
-const rimrafSync = require("rimraf").sync
+const fs = require("fs-extra")
 const execSync = require("shelljs").exec
 
 //------------------------------------------------------------------------------
@@ -30,8 +26,8 @@ const execSync = require("shelljs").exec
  * @returns {void}
  */
 const writeFile = module.exports.writeFile = function writeFile(path, contentText) {
-    mkdirSync(dirname(path))
-    writeFileSync(path, contentText)
+    fs.ensureDirSync(dirname(path))
+    fs.writeFileSync(path, contentText)
 }
 
 /**
@@ -41,7 +37,7 @@ const writeFile = module.exports.writeFile = function writeFile(path, contentTex
  * @returns {void}
  */
 module.exports.removeFile = function removeFile(path) {
-    rimrafSync(path)
+    fs.removeSync(path)
 }
 
 /**
@@ -53,7 +49,7 @@ module.exports.removeFile = function removeFile(path) {
 module.exports.setupTestDir = function setupTestDir(dataset) {
     for (const path of Object.keys(dataset)) {
         if (dataset[path] == null) {
-            mkdirSync(path)
+            fs.ensureDirSync(path)
         }
         else {
             writeFile(path, dataset[path])
@@ -68,7 +64,7 @@ module.exports.setupTestDir = function setupTestDir(dataset) {
  * @returns {void}
  */
 module.exports.teardownTestDir = function teardownTestDir(testRootPath) {
-    rimrafSync(testRootPath)
+    fs.removeSync(testRootPath)
 }
 
 /**
@@ -79,7 +75,7 @@ module.exports.teardownTestDir = function teardownTestDir(testRootPath) {
  */
 module.exports.content = function content(path) {
     try {
-        return readFileSync(path, {encoding: "utf8"})
+        return fs.readFileSync(path, {encoding: "utf8"})
     }
     catch (_err) {
         return null
@@ -92,7 +88,7 @@ module.exports.content = function content(path) {
  * @returns {child_process.ChildProcess} A child process object.
  */
 module.exports.execCommand = function execCommand(args) {
-    return exec(`node bin/index.js ${args}`)
+    return exec(`node test/util/bin.js ${args}`)
 }
 
 /**
@@ -101,5 +97,5 @@ module.exports.execCommand = function execCommand(args) {
  * @returns {void}
  */
 module.exports.execCommandSync = function execCommandSync(args) {
-    return execSync(`node bin/index.js ${args}`, {silent: true})
+    return execSync(`node test/util/bin.js ${args}`, {silent: true})
 }

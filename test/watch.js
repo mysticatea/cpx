@@ -9,11 +9,11 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-const fs = require("fs")
-const path = require("path")
 const assert = require("assert")
-const mkdirSync = require("mkdirp").sync
-const rimrafSync = require("rimraf").sync
+const path = require("path")
+const fs = require("fs-extra")
+const ensureDirSync = fs.ensureDirSync
+const removeSync = fs.removeSync
 const cpx = require("..")
 const util = require("./util/util")
 const setupTestDir = util.setupTestDir
@@ -65,7 +65,7 @@ describe("The watch method", () => {
         else if (command) {
             command.stdout.on("data", function listener(chunk) {
                 // Done the first copies.
-                if (chunk.indexOf("Be watching in") >= 0) {
+                if (chunk.indexOf("Be watching") >= 0) {
                     command.stdout.removeListener("data", listener)
                     cb()
                 }
@@ -211,6 +211,48 @@ describe("The watch method", () => {
 
         it("command version.", (done) => {
             command = execCommand("\"test-ws/a/**/*.txt\" test-ws/b --watch --dereference --verbose")
+            waitForReady(() => {
+                verifyFiles()
+                done()
+            })
+        })
+    })
+
+    describe("should not copy files in symlink directory when `--dereference` option was not given:", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/src/a/hello.txt": "Symlinked",
+                "test-ws/a/hello.txt": "Hello",
+            })
+            fs.symlinkSync(
+                path.resolve("test-ws/src"),
+                path.resolve("test-ws/a/link"),
+                "junction"
+            )
+        })
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/a/hello.txt") === "Hello")
+            assert(content("test-ws/a/link/a/hello.txt") === "Symlinked")
+            assert(content("test-ws/b/hello.txt") === "Hello")
+            assert(content("test-ws/b/link/a/hello.txt") === null)
+        }
+
+        it("lib version.", (done) => {
+            watcher = cpx.watch("test-ws/a/**/*.txt", "test-ws/b", {dereference: false})
+            watcher.on("watch-ready", () => {
+                // Done the first copies.
+                verifyFiles()
+                done()
+            })
+        })
+
+        it("command version.", (done) => {
+            command = execCommand("\"test-ws/a/**/*.txt\" test-ws/b --watch --verbose")
             waitForReady(() => {
                 verifyFiles()
                 done()
@@ -441,7 +483,7 @@ describe("The watch method", () => {
         },
     ]
     for (const pattern of patterns) {
-        describe(pattern.description, () => { //eslint-disable-line no-loop-func
+        (pattern.only ? describe.only : describe)(pattern.description, () => { //eslint-disable-line no-loop-func
             beforeEach(() => {
                 setupTestDir(pattern.initialFiles)
             })
@@ -501,7 +543,7 @@ describe("The watch method", () => {
         it("lib version.", (done) => {
             watcher = cpx.watch("test-ws/a/**", "test-ws/b", {includeEmptyDirs: true})
             waitForReady(() => {
-                mkdirSync("test-ws/a/c")
+                ensureDirSync("test-ws/a/c")
                 waitForCopy(() => {
                     verifyFiles()
                     done()
@@ -512,7 +554,7 @@ describe("The watch method", () => {
         it("command version.", (done) => {
             command = execCommand("\"test-ws/a/**\" test-ws/b --include-empty-dirs --watch --verbose")
             waitForReady(() => {
-                mkdirSync("test-ws/a/c")
+                ensureDirSync("test-ws/a/c")
                 waitForCopy(() => {
                     verifyFiles()
                     done()
@@ -543,7 +585,7 @@ describe("The watch method", () => {
         it("lib version.", (done) => {
             watcher = cpx.watch("test-ws/a/**", "test-ws/b", {includeEmptyDirs: true})
             waitForReady(() => {
-                rimrafSync("test-ws/a/c")
+                removeSync("test-ws/a/c")
                 waitForRemove(() => {
                     verifyFiles()
                     done()
@@ -554,7 +596,7 @@ describe("The watch method", () => {
         it("command version.", (done) => {
             command = execCommand("\"test-ws/a/**\" test-ws/b --include-empty-dirs --watch --verbose")
             waitForReady(() => {
-                rimrafSync("test-ws/a/c")
+                removeSync("test-ws/a/c")
                 waitForRemove(() => {
                     verifyFiles()
                     done()

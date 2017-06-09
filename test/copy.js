@@ -65,6 +65,11 @@ describe("The copy method", () => {
             })
         })
 
+        it("lib async version (promise).", () =>
+            cpx.copy("test-ws/a/**/*.txt", "test-ws/b")
+                .then(verifyFiles)
+        )
+
         it("lib sync version.", () => {
             cpx.copySync("test-ws/a/**/*.txt", "test-ws/b")
             verifyFiles()
@@ -172,6 +177,53 @@ describe("The copy method", () => {
 
         it("command version.", () => {
             execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --dereference")
+            verifyFiles()
+        })
+    })
+
+
+    describe("should not copy files inside of symlink directory when `--dereference` option was not specified:", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/src/a/hello.txt": "Symlinked",
+                "test-ws/a/hello.txt": "Hello",
+            })
+            fs.symlinkSync(
+                path.resolve("test-ws/src"),
+                path.resolve("test-ws/a/link"),
+                "junction"
+            )
+        })
+        afterEach(() => {
+            teardownTestDir("test-ws")
+        })
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            assert(content("test-ws/a/hello.txt") === "Hello")
+            assert(content("test-ws/a/link/a/hello.txt") === "Symlinked")
+            assert(content("test-ws/b/hello.txt") === "Hello")
+            assert(content("test-ws/b/link/a/hello.txt") === null)
+        }
+
+        it("lib async version.", (done) => {
+            cpx.copy("test-ws/a/**/*.txt", "test-ws/b", {}, (err) => {
+                assert(err === null)
+                verifyFiles()
+                done()
+            })
+        })
+
+        it("lib sync version.", () => {
+            cpx.copySync("test-ws/a/**/*.txt", "test-ws/b", {})
+            verifyFiles()
+        })
+
+        it("command version.", () => {
+            execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b")
             verifyFiles()
         })
     })

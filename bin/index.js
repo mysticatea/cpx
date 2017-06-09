@@ -58,11 +58,10 @@ const outDir = args._[1]
 if (unknowns.size > 0) {
     console.error(`Unknown option(s): ${Array.from(unknowns).join(", ")}`)
     process.exitCode = 1
-    return
 }
 
 // Main.
-if (args.help) {
+else if (args.help) {
     require("./help")()
 }
 else if (args.version) {

@@ -17,7 +17,20 @@ const spawn = require("child_process").spawn
 const resolveModule = require("resolve").sync
 const parseShellQuote = require("shell-quote").parse
 const duplexer = require("duplexer")
-const Cpx = require("../lib/cpx")
+const applyAction = require("../lib/utils/apply-action")
+const applyActionSync = require("../lib/utils/apply-action-sync")
+const copyFile = require("../lib/utils/copy-file")
+const normalizeOptions = require("../lib/utils/normalize-options")
+const removeFileSync = require("../lib/utils/remove-file-sync")
+const Watcher = require("../lib/utils/watcher")
+
+//------------------------------------------------------------------------------
+// Helpers
+//------------------------------------------------------------------------------
+
+const ABS_OR_REL = /^[./]/
+const C_OR_COMMAND = /^(?:-c|--command)$/
+const T_OR_TRANSFORM = /^(?:-t|--transform)$/
 
 //------------------------------------------------------------------------------
 // Exports
@@ -53,7 +66,6 @@ module.exports = function main(source, outDir, args) {
         })
 
     // Resolve Transforms.
-    const ABS_OR_REL = /^[./]/
     const transforms = [].concat(args.transform)
         .filter(Boolean)
         .map(arg => {
@@ -76,8 +88,6 @@ module.exports = function main(source, outDir, args) {
         })
 
     // Merge commands and transforms as same as order of process.argv.
-    const C_OR_COMMAND = /^(?:-c|--command)$/
-    const T_OR_TRANSFORM = /^(?:-t|--transform)$/
     const mergedTransformFactories =
         process.argv
             .map(part => {
@@ -92,7 +102,10 @@ module.exports = function main(source, outDir, args) {
             .filter(Boolean)
 
     // Main.
-    const cpx = new Cpx(
+    const log = args.verbose
+        ? console.log.bind(console)
+        : () => { /* do nothing */ }
+    const options = normalizeOptions(
         source,
         outDir,
         {
@@ -104,63 +117,66 @@ module.exports = function main(source, outDir, args) {
             update: args.update,
         }
     )
-    if (args.verbose) {
-        cpx.on("copy", (event) => {
-            console.log(`Copied: ${event.srcPath} --> ${event.dstPath}`)
-        })
-        cpx.on("remove", (event) => {
-            console.log(`Removed: ${event.path}`)
-        })
-    }
 
     if (args.clean) {
-        if (args.verbose) {
-            console.log()
-            console.log(`Clean: ${cpx.src2dst(cpx.source)}`)
-            console.log()
-        }
-        try {
-            cpx.cleanSync()
-        }
-        catch (err) {
-            console.error(`Failed to clean: ${err.message}.`)
-            process.exit(1)
-        }
-        if (args.verbose) {
-            console.log()
-            console.log(`Copy: ${source} --> ${outDir}`)
-            console.log()
+        const output = options.toDestination(options.source)
+        if (output !== options.source) {
+            log()
+            log(`Clean: ${output}`)
+            log()
+            try {
+                applyActionSync(output, options, (targetPath) => {
+                    removeFileSync(targetPath)
+                    log(`Removed: ${targetPath}`)
+                })
+            }
+            catch (err) {
+                console.error(`Failed to clean: ${err.message}.`)
+                process.exit(1)
+            }
         }
     }
 
     if (args.watch) {
-        if (args.verbose) {
-            cpx.on("watch-ready", () => {
-                console.log()
-                console.log(`Be watching in ${cpx.base}`)
-                console.log()
-            })
+        if (options.initialCopy) {
+            log()
+            log(`Copy: ${source} --> ${outDir}`)
+            log()
         }
-        cpx.on("watch-error", (err) => {
-            console.error(err.message)
-        })
 
-        // In order to kill me by test harness on Windows.
-        process.stdin.setEncoding("utf8")
-        process.stdin.on("data", (chunk) => {
-            if (chunk === "KILL") {
-                process.exit(0)
-            }
-        })
-
-        cpx.watch()
+        new Watcher(options)
+            .on("copy", (event) => {
+                log(`Copied: ${event.srcPath} --> ${event.dstPath}`)
+            })
+            .on("remove", (event) => {
+                log(`Removed: ${event.path}`)
+            })
+            .on("watch-ready", () => {
+                log()
+                log(`Be watching ${options.source}`)
+                log()
+            })
+            .on("watch-error", (err) => {
+                console.error(err.message)
+            })
+            .open()
     }
     else {
-        cpx.copy(err => {
-            if (err) {
-                console.error(`Failed to copy: ${err.message}.`)
-                process.exit(1)
+        log()
+        log(`Copy: ${source} --> ${outDir}`)
+        log()
+
+        applyAction(options.source, options, (sourcePath) => {
+            const outputPath = options.toDestination(sourcePath)
+            if (outputPath !== sourcePath) {
+                return copyFile(sourcePath, outputPath, options).then(() => {
+                    log(`Copied: ${sourcePath} --> ${outputPath}`)
+                })
             }
+            return Promise.resolve()
+        }).catch(error => {
+            console.error(`Failed to copy: ${error.message}.`)
+            process.exit(1)
         })
     }
 }
