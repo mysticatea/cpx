@@ -12,7 +12,7 @@
     "lib"
   ],
   "scripts": {
-    "_mocha": "_mocha \"test/*.js\" --timeout 15000",
+    "_mocha": "_mocha \"test/*.js\" --timeout 60000",
     "clean": "rimraf .nyc_output coverage test-ws",
     "codecov": "nyc report -r lcovonly && codecov",
     "coverage": "nyc report -r lcov && opener coverage/lcov-report/index.html",
@@ -43,7 +43,6 @@
     "codecov": "^2.2.0",
     "eslint": "^3.19.0",
     "eslint-config-mysticatea": "^10.0.0",
-    "eslint-plugin-node": "^5.0.0",
     "mocha": "^3.4.2",
     "nyc": "^11.0.1",
     "opener": "^1.4.3",
