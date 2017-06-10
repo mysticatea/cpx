@@ -473,10 +473,10 @@ describe("The watch method", () => {
             action() {
                 removeFile("test-ws/a/hello.dat")
                 // To fire copy event.
-                writeFile("test-ws/a/a.txt", "a")
+                writeFile("test-ws/a/hello.txt", "changed")
             },
             verify: {
-                "test-ws/b/hello.txt": "Hello",
+                "test-ws/b/hello.txt": "changed",
                 "test-ws/b/hello.dat": null,
             },
             wait: waitForCopy,
@@ -521,6 +521,59 @@ describe("The watch method", () => {
             })
         })
     }
+
+    describe("should do reactions of multiple events:", () => {
+        beforeEach(() => {
+            setupTestDir({
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/hello.dat": "Hello",
+            })
+        })
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            const files = {
+                "test-ws/b/hello.txt": null,
+                "test-ws/b/hello.dat": null,
+                "test-ws/b/added.txt": "added",
+                "test-ws/b/added.dat": null,
+            }
+            for (const file of Object.keys(files)) {
+                assert(content(file) === files[file])
+            }
+        }
+
+        xit("lib version.", (done) => {
+            watcher = cpx.watch("test-ws/a/**/*.txt", "test-ws/b")
+            waitForReady(() => {
+                removeFile("test-ws/a/hello.dat")
+                removeFile("test-ws/a/hello.txt")
+                writeFile("test-ws/a/added.dat", "added_data")
+                writeFile("test-ws/a/added.txt", "added")
+                waitForRemove(() => {
+                    verifyFiles()
+                    done()
+                })
+            })
+        })
+
+        it("command version.", (done) => {
+            command = execCommand("\"test-ws/a/**/*.txt\" test-ws/b --watch --verbose")
+            waitForReady(() => {
+                removeFile("test-ws/a/hello.dat")
+                removeFile("test-ws/a/hello.txt")
+                writeFile("test-ws/a/added.dat", "added_data")
+                writeFile("test-ws/a/added.txt", "added")
+                waitForRemove(() => {
+                    verifyFiles()
+                    done()
+                })
+            })
+        })
+    })
 
     describe("should copy it when an empty directory is added when '--include-empty-dirs' option was given:", () => {
         beforeEach(() => {
