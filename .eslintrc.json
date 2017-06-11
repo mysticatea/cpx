@@ -1,3 +1,6 @@
 {
-    "extends": ["mysticatea", "mysticatea/node"]
+    "extends": ["mysticatea", "mysticatea/node"],
+    "rules": {
+        "prefer-rest-params": "off"
+    }
 }
