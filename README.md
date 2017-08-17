@@ -142,7 +142,7 @@ Arguments is same as `cpx.copy`.
 
 - `.on("copy", (e) => { ... })` : Be fired after file is copied. `e.srcPath` is a path of original file. `e.dstPath` is a path of new file.
 - `.on("remove", (e) => { ... })` : Be fired after file is removed. `e.path` is a path of removed file.
-- `.on("watch-raedy", () => { ... })` : Be fired when started watching files, after the first copying.
+- `.on("watch-ready", () => { ... })` : Be fired when started watching files, after the first copying.
 - `.on("watch-error", (err) => { ... })` : Be fired when occured errors during watching.
 
 ## Changelog
