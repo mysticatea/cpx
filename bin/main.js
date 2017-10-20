@@ -87,7 +87,8 @@ module.exports = function main(source, outDir, args) {
             const createStream = ABS_OR_REL.test(item.name)
                 ? require(resolvePath(item.name))
                 : require(resolveModule(item.name, { basedir: process.cwd() }))
-            return file => createStream(file, item.argv)
+            return (file, opts) =>
+                createStream(file, Object.assign({ _flags: opts }, item.argv))
         })
 
     // Merge commands and transforms as same as order of process.argv.
