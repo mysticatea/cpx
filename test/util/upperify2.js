@@ -23,6 +23,7 @@ const inherits = require("util").inherits
 function Upperify() {
     Transform.call(this)
 }
+
 inherits(Upperify, Transform)
 
 Object.defineProperties(Upperify.prototype, {
