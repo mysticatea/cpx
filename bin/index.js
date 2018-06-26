@@ -44,7 +44,7 @@ const args = subarg(process.argv.slice(2), {
         "version",
         "watch",
     ],
-    default: {initial: true},
+    default: { initial: true },
     unknown(arg) {
         if (arg[0] === "-") {
             unknowns.add(arg)

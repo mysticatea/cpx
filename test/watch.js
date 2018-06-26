@@ -59,7 +59,6 @@ describe("The watch method", () => {
             yield pEvent(watcher, "watch-ready")
         }
         else if (command) {
-            //eslint-disable-next-line no-constant-condition
             while (true) {
                 const chunk = yield pEvent(command.stdout, "data")
                 if (chunk.indexOf("Be watching") >= 0) {
@@ -79,7 +78,6 @@ describe("The watch method", () => {
             yield pEvent(watcher, "copy")
         }
         else if (command) {
-            //eslint-disable-next-line no-constant-condition
             while (true) {
                 const chunk = yield pEvent(command.stdout, "data")
                 if (chunk.indexOf("Copied:") >= 0) {
@@ -99,7 +97,6 @@ describe("The watch method", () => {
             yield pEvent(watcher, "remove")
         }
         else if (command) {
-            //eslint-disable-next-line no-constant-condition
             while (true) {
                 const chunk = yield pEvent(command.stdout, "data")
                 if (chunk.indexOf("Removed:") >= 0) {
@@ -180,7 +177,7 @@ describe("The watch method", () => {
         }
 
         it("lib version.", co.wrap(function* () {
-            watcher = cpx.watch("test-ws/a/**/*.txt", "test-ws/b", {dereference: true})
+            watcher = cpx.watch("test-ws/a/**/*.txt", "test-ws/b", { dereference: true })
             yield waitForReady()
             yield verifyFiles()
         }))
@@ -219,7 +216,7 @@ describe("The watch method", () => {
         }
 
         it("lib version.", co.wrap(function* () {
-            watcher = cpx.watch("test-ws/a/**/*.txt", "test-ws/b", {dereference: false})
+            watcher = cpx.watch("test-ws/a/**/*.txt", "test-ws/b", { dereference: false })
             yield waitForReady()
             yield verifyFiles()
         }))
@@ -305,7 +302,7 @@ describe("The watch method", () => {
         }
 
         it("lib version.", co.wrap(function* () {
-            watcher = cpx.watch("test-ws/a/**/*.txt", "test-ws/b", {clean: true})
+            watcher = cpx.watch("test-ws/a/**/*.txt", "test-ws/b", { clean: true })
             yield waitForReady()
             yield verifyFiles()
         }))
@@ -346,7 +343,7 @@ describe("The watch method", () => {
         }
 
         it("lib version.", co.wrap(function* () {
-            watcher = cpx.watch("test-ws/a/**/*.txt", "test-ws/b", {initialCopy: false})
+            watcher = cpx.watch("test-ws/a/**/*.txt", "test-ws/b", { initialCopy: false })
             yield waitForReady()
             yield verifyFiles()
         }))
@@ -361,7 +358,7 @@ describe("The watch method", () => {
     const patterns = [
         {
             description: "should copy on file added:",
-            initialFiles: {"test-ws/a/hello.txt": "Hello"},
+            initialFiles: { "test-ws/a/hello.txt": "Hello" },
             action() {
                 return writeFile("test-ws/a/b/added.txt", "added")
             },
@@ -373,7 +370,7 @@ describe("The watch method", () => {
         },
         {
             description: "should do nothing on file added if unmatch file globs:",
-            initialFiles: {"test-ws/a/hello.txt": "Hello"},
+            initialFiles: { "test-ws/a/hello.txt": "Hello" },
             action() {
                 return co(function* () {
                     yield writeFile("test-ws/a/b/not-added.dat", "added")
@@ -388,11 +385,11 @@ describe("The watch method", () => {
         },
         {
             description: "should copy on file changed:",
-            initialFiles: {"test-ws/a/hello.txt": "Hello"},
+            initialFiles: { "test-ws/a/hello.txt": "Hello" },
             action() {
                 return writeFile("test-ws/a/hello.txt", "changed")
             },
-            verify: {"test-ws/b/hello.txt": "changed"},
+            verify: { "test-ws/b/hello.txt": "changed" },
             wait: waitForCopy,
         },
         {
@@ -415,11 +412,11 @@ describe("The watch method", () => {
         },
         {
             description: "should remove in the destination directory on file removed:",
-            initialFiles: {"test-ws/a/hello.txt": "Hello"},
+            initialFiles: { "test-ws/a/hello.txt": "Hello" },
             action() {
                 return removeFile("test-ws/a/hello.txt")
             },
-            verify: {"test-ws/b/hello.txt": null},
+            verify: { "test-ws/b/hello.txt": null },
             wait: waitForRemove,
         },
         {
@@ -524,7 +521,7 @@ describe("The watch method", () => {
         }
 
         it("lib version.", co.wrap(function* () {
-            watcher = cpx.watch("test-ws/a/**", "test-ws/b", {includeEmptyDirs: true})
+            watcher = cpx.watch("test-ws/a/**", "test-ws/b", { includeEmptyDirs: true })
             yield waitForReady()
             yield ensureDir("test-ws/a/c")
             yield waitForCopy()
@@ -560,7 +557,7 @@ describe("The watch method", () => {
         }
 
         it("lib version.", co.wrap(function* () {
-            watcher = cpx.watch("test-ws/a/**", "test-ws/b", {includeEmptyDirs: true})
+            watcher = cpx.watch("test-ws/a/**", "test-ws/b", { includeEmptyDirs: true })
             yield waitForReady()
             yield remove("test-ws/a/c")
             yield waitForRemove()
@@ -595,7 +592,7 @@ describe("The watch method", () => {
         }
 
         it("lib version.", co.wrap(function* () {
-            watcher = cpx.watch("test-ws/a/**", "test-ws/b", {initialCopy: false})
+            watcher = cpx.watch("test-ws/a/**", "test-ws/b", { initialCopy: false })
             yield waitForReady()
             yield writeFile("test-ws/a/added.txt", "added")
             yield waitForCopy()
@@ -628,7 +625,7 @@ describe("The watch method", () => {
         }
 
         it("lib version.", co.wrap(function* () {
-            watcher = cpx.watch("test-ws/a(paren)/**", "test-ws/b", {initialCopy: false})
+            watcher = cpx.watch("test-ws/a(paren)/**", "test-ws/b", { initialCopy: false })
             yield waitForReady()
             yield writeFile("test-ws/a(paren)/hello.txt", "Hello 2")
             yield waitForCopy()

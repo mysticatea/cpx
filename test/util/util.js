@@ -59,7 +59,7 @@ module.exports.removeFile = function removeFile(path) {
  * @returns {Promise<string|null>} The content of the file, or `null` if not found.
  */
 const readFile = module.exports.content = function content(path) {
-    return fs.readFile(path, {encoding: "utf8"}).catch(() => null)
+    return fs.readFile(path, { encoding: "utf8" }).catch(() => null)
 }
 
 /**
@@ -73,8 +73,7 @@ module.exports.setupTestDir = function setupTestDir(dataset) {
         Object.keys(dataset).map(path =>
             (dataset[path] == null)
                 ? fs.ensureDir(path)
-                : writeFile(path, dataset[path])
-        )
+                : writeFile(path, dataset[path]))
     ).then(() => delay(250))
 }
 
@@ -116,5 +115,5 @@ module.exports.execCommand = function execCommand(args) {
  * @returns {void}
  */
 module.exports.execCommandSync = function execCommandSync(args) {
-    return execSync(`node test/util/bin.js ${args}`, {silent: true})
+    return execSync(`node test/util/bin.js ${args}`, { silent: true })
 }
