@@ -366,41 +366,6 @@ describe("The copy method", () => {
         })
     })
 
-    describe("should not copy attributes when `--preserve` option was not given:", () => {
-        afterEach(() => teardownTestDir("test-ws"))
-
-        /**
-         * Verify.
-         * @returns {void}
-         */
-        function verifyFiles() {
-            return co(function*() {
-                const srcStat = yield fs.stat("./LICENSE")
-                const dstStat = yield fs.stat("./test-ws/LICENSE")
-                const srcMtime = Math.floor(srcStat.mtime.getTime() / 1000)
-                const dstMtime = Math.floor(dstStat.mtime.getTime() / 1000)
-
-                assert(srcMtime !== dstMtime)
-            })
-        }
-
-        it("lib async version.", done => {
-            cpx.copy("LICENSE", "test-ws", () =>
-                verifyFiles().then(() => done(), done)
-            )
-        })
-
-        it("lib sync version.", () => {
-            cpx.copySync("LICENSE", "test-ws")
-            return verifyFiles()
-        })
-
-        it("command version.", () => {
-            execCommandSync("LICENSE test-ws")
-            return verifyFiles()
-        })
-    })
-
     describe("should copy attributes when `--preserve` option was given:", () => {
         afterEach(() => teardownTestDir("test-ws"))
 
