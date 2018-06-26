@@ -38,7 +38,8 @@ const T_OR_TRANSFORM = /^(?:-t|--transform)$/
 
 module.exports = function main(source, outDir, args) {
     // Resolve Command.
-    const commands = [].concat(args.command)
+    const commands = []
+        .concat(args.command)
         .filter(Boolean)
         .map(command => {
             if (typeof command !== "string") {
@@ -46,12 +47,14 @@ module.exports = function main(source, outDir, args) {
                 process.exit(1)
             }
 
-            return (file) => {
-                const env = Object.create(process.env, { FILE: { value: file } })
+            return file => {
+                const env = Object.create(process.env, {
+                    FILE: { value: file },
+                })
                 const parts = parseShellQuote(command, env)
                 const child = spawn(parts[0], parts.slice(1), { env })
                 const outer = duplexer(child.stdin, child.stdout)
-                child.on("exit", (code) => {
+                child.on("exit", code => {
                     if (code !== 0) {
                         const error = new Error(
                             `non-zero exit code in command: ${command}`
@@ -66,7 +69,8 @@ module.exports = function main(source, outDir, args) {
         })
 
     // Resolve Transforms.
-    const transforms = [].concat(args.transform)
+    const transforms = []
+        .concat(args.transform)
         .filter(Boolean)
         .map(arg => {
             if (typeof arg === "string") {
@@ -80,43 +84,39 @@ module.exports = function main(source, outDir, args) {
             process.exit(1)
         })
         .map(item => {
-            const createStream = (ABS_OR_REL.test(item.name) ?
-                require(resolvePath(item.name)) :
-                require(resolveModule(item.name, { basedir: process.cwd() }))
-            )
-            return (file) => createStream(file, item.argv)
+            const createStream = ABS_OR_REL.test(item.name)
+                ? require(resolvePath(item.name))
+                : require(resolveModule(item.name, { basedir: process.cwd() }))
+            return file => createStream(file, item.argv)
         })
 
     // Merge commands and transforms as same as order of process.argv.
-    const mergedTransformFactories =
-        process.argv
-            .map(part => {
-                if (C_OR_COMMAND.test(part)) {
-                    return commands.shift()
-                }
-                if (T_OR_TRANSFORM.test(part)) {
-                    return transforms.shift()
-                }
-                return null
-            })
-            .filter(Boolean)
+    const mergedTransformFactories = process.argv
+        .map(part => {
+            if (C_OR_COMMAND.test(part)) {
+                return commands.shift()
+            }
+            if (T_OR_TRANSFORM.test(part)) {
+                return transforms.shift()
+            }
+            return null
+        })
+        .filter(Boolean)
 
     // Main.
     const log = args.verbose
         ? console.log.bind(console)
-        : () => { /* do nothing */ }
-    const options = normalizeOptions(
-        source,
-        outDir,
-        {
-            transform: mergedTransformFactories,
-            dereference: args.dereference,
-            includeEmptyDirs: args.includeEmptyDirs,
-            initialCopy: args.initial,
-            preserve: args.preserve,
-            update: args.update,
-        }
-    )
+        : () => {
+              /* do nothing */
+          }
+    const options = normalizeOptions(source, outDir, {
+        transform: mergedTransformFactories,
+        dereference: args.dereference,
+        includeEmptyDirs: args.includeEmptyDirs,
+        initialCopy: args.initial,
+        preserve: args.preserve,
+        update: args.update,
+    })
 
     if (args.clean) {
         const output = options.toDestination(options.source)
@@ -125,12 +125,11 @@ module.exports = function main(source, outDir, args) {
             log(`Clean: ${output}`)
             log()
             try {
-                applyActionSync(output, options, (targetPath) => {
+                applyActionSync(output, options, targetPath => {
                     removeFileSync(targetPath)
                     log(`Removed: ${targetPath}`)
                 })
-            }
-            catch (err) {
+            } catch (err) {
                 console.error(`Failed to clean: ${err.message}.`)
                 process.exit(1)
             }
@@ -145,10 +144,10 @@ module.exports = function main(source, outDir, args) {
         }
 
         new Watcher(options)
-            .on("copy", (event) => {
+            .on("copy", event => {
                 log(`Copied: ${event.srcPath} --> ${event.dstPath}`)
             })
-            .on("remove", (event) => {
+            .on("remove", event => {
                 log(`Removed: ${event.path}`)
             })
             .on("watch-ready", () => {
@@ -156,17 +155,16 @@ module.exports = function main(source, outDir, args) {
                 log(`Be watching ${options.source}`)
                 log()
             })
-            .on("watch-error", (err) => {
+            .on("watch-error", err => {
                 console.error(err.message)
             })
             .open()
-    }
-    else {
+    } else {
         log()
         log(`Copy: ${source} --> ${outDir}`)
         log()
 
-        applyAction(options.source, options, (sourcePath) => {
+        applyAction(options.source, options, sourcePath => {
             const outputPath = options.toDestination(sourcePath)
             if (outputPath !== sourcePath) {
                 return copyFile(sourcePath, outputPath, options).then(() => {

@@ -28,13 +28,14 @@ const upperify2 = require("./util/upperify2")
 
 describe("The copy method", () => {
     describe("should copy specified files with globs:", () => {
-        beforeEach(() => setupTestDir({
-            "test-ws/untouchable.txt": "untouchable",
-            "test-ws/a/hello.txt": "Hello",
-            "test-ws/a/b/this-is.txt": "A pen",
-            "test-ws/a/b/that-is.txt": "A note",
-            "test-ws/a/b/no-copy.dat": "no-copy",
-        }))
+        beforeEach(() =>
+            setupTestDir({
+                "test-ws/untouchable.txt": "untouchable",
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/b/this-is.txt": "A pen",
+                "test-ws/a/b/that-is.txt": "A note",
+                "test-ws/a/b/no-copy.dat": "no-copy",
+            }))
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -56,14 +57,14 @@ describe("The copy method", () => {
             })
         }
 
-        it("lib async version.", (done) => {
+        it("lib async version.", done => {
             cpx.copy("test-ws/a/**/*.txt", "test-ws/b", () =>
-                verifyFiles().then(() => done(), done))
+                verifyFiles().then(() => done(), done)
+            )
         })
 
         it("lib async version (promise).", () =>
-            cpx.copy("test-ws/a/**/*.txt", "test-ws/b")
-                .then(verifyFiles))
+            cpx.copy("test-ws/a/**/*.txt", "test-ws/b").then(verifyFiles))
 
         it("lib sync version.", () => {
             cpx.copySync("test-ws/a/**/*.txt", "test-ws/b")
@@ -71,21 +72,22 @@ describe("The copy method", () => {
         })
 
         it("command version.", () => {
-            execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b")
+            execCommandSync('"test-ws/a/**/*.txt" test-ws/b')
             return verifyFiles()
         })
     })
 
     describe("should clean and copy specified files with globs when give clean option:", () => {
-        beforeEach(() => setupTestDir({
-            "test-ws/untouchable.txt": "untouchable",
-            "test-ws/a/hello.txt": "Hello",
-            "test-ws/a/b/this-is.txt": "A pen",
-            "test-ws/a/b/that-is.txt": "A note",
-            "test-ws/a/b/no-copy.dat": "no-copy",
-            "test-ws/b/b/remove.txt": "remove",
-            "test-ws/b/b/no-remove.dat": "no-remove",
-        }))
+        beforeEach(() =>
+            setupTestDir({
+                "test-ws/untouchable.txt": "untouchable",
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/b/this-is.txt": "A pen",
+                "test-ws/a/b/that-is.txt": "A note",
+                "test-ws/a/b/no-copy.dat": "no-copy",
+                "test-ws/b/b/remove.txt": "remove",
+                "test-ws/b/b/no-remove.dat": "no-remove",
+            }))
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -109,9 +111,10 @@ describe("The copy method", () => {
             })
         }
 
-        it("lib async version.", (done) => {
+        it("lib async version.", done => {
             cpx.copy("test-ws/a/**/*.txt", "test-ws/b", { clean: true }, () =>
-                verifyFiles().then(() => done(), done))
+                verifyFiles().then(() => done(), done)
+            )
         })
 
         it("lib sync version.", () => {
@@ -120,23 +123,25 @@ describe("The copy method", () => {
         })
 
         it("command version.", () => {
-            execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --clean")
+            execCommandSync('"test-ws/a/**/*.txt" test-ws/b --clean')
             return verifyFiles()
         })
     })
 
     describe("should copy files inside of symlink directory when `--dereference` option was specified:", () => {
-        beforeEach(co.wrap(function* () {
-            yield setupTestDir({
-                "test-ws/src/a/hello.txt": "Symlinked",
-                "test-ws/a/hello.txt": "Hello",
+        beforeEach(
+            co.wrap(function*() {
+                yield setupTestDir({
+                    "test-ws/src/a/hello.txt": "Symlinked",
+                    "test-ws/a/hello.txt": "Hello",
+                })
+                yield fs.symlink(
+                    path.resolve("test-ws/src"),
+                    path.resolve("test-ws/a/link"),
+                    "junction"
+                )
             })
-            yield fs.symlink(
-                path.resolve("test-ws/src"),
-                path.resolve("test-ws/a/link"),
-                "junction"
-            )
-        }))
+        )
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -152,35 +157,42 @@ describe("The copy method", () => {
             })
         }
 
-        it("lib async version.", (done) => {
-            cpx.copy("test-ws/a/**/*.txt", "test-ws/b", { dereference: true }, () =>
-                verifyFiles().then(() => done(), done))
+        it("lib async version.", done => {
+            cpx.copy(
+                "test-ws/a/**/*.txt",
+                "test-ws/b",
+                { dereference: true },
+                () => verifyFiles().then(() => done(), done)
+            )
         })
 
         it("lib sync version.", () => {
-            cpx.copySync("test-ws/a/**/*.txt", "test-ws/b", { dereference: true })
+            cpx.copySync("test-ws/a/**/*.txt", "test-ws/b", {
+                dereference: true,
+            })
             return verifyFiles()
         })
 
         it("command version.", () => {
-            execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --dereference")
+            execCommandSync('"test-ws/a/**/*.txt" test-ws/b --dereference')
             return verifyFiles()
         })
     })
 
-
     describe("should not copy files inside of symlink directory when `--dereference` option was not specified:", () => {
-        beforeEach(co.wrap(function* () {
-            yield setupTestDir({
-                "test-ws/src/a/hello.txt": "Symlinked",
-                "test-ws/a/hello.txt": "Hello",
+        beforeEach(
+            co.wrap(function*() {
+                yield setupTestDir({
+                    "test-ws/src/a/hello.txt": "Symlinked",
+                    "test-ws/a/hello.txt": "Hello",
+                })
+                yield fs.symlink(
+                    path.resolve("test-ws/src"),
+                    path.resolve("test-ws/a/link"),
+                    "junction"
+                )
             })
-            yield fs.symlink(
-                path.resolve("test-ws/src"),
-                path.resolve("test-ws/a/link"),
-                "junction"
-            )
-        }))
+        )
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -196,9 +208,10 @@ describe("The copy method", () => {
             })
         }
 
-        it("lib async version.", (done) => {
+        it("lib async version.", done => {
             cpx.copy("test-ws/a/**/*.txt", "test-ws/b", {}, () =>
-                verifyFiles().then(() => done(), done))
+                verifyFiles().then(() => done(), done)
+            )
         })
 
         it("lib sync version.", () => {
@@ -207,17 +220,18 @@ describe("The copy method", () => {
         })
 
         it("command version.", () => {
-            execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b")
+            execCommandSync('"test-ws/a/**/*.txt" test-ws/b')
             return verifyFiles()
         })
     })
 
     describe("should copy specified empty directories with globs when `--include-empty-dirs` option was given:", () => {
-        beforeEach(() => setupTestDir({
-            "test-ws/a/hello.txt": "Hello",
-            "test-ws/a/b/pen.txt": "A pen",
-            "test-ws/a/c": null,
-        }))
+        beforeEach(() =>
+            setupTestDir({
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/b/pen.txt": "A pen",
+                "test-ws/a/c": null,
+            }))
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -225,7 +239,7 @@ describe("The copy method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            return co(function* () {
+            return co(function*() {
                 yield verifyTestDir({
                     "test-ws/a/hello.txt": "Hello",
                     "test-ws/a/b/pen.txt": "A pen",
@@ -237,28 +251,35 @@ describe("The copy method", () => {
             })
         }
 
-        it("lib async version.", (done) => {
-            cpx.copy("test-ws/a/**", "test-ws/b", { includeEmptyDirs: true }, () =>
-                verifyFiles().then(() => done(), done))
+        it("lib async version.", done => {
+            cpx.copy(
+                "test-ws/a/**",
+                "test-ws/b",
+                { includeEmptyDirs: true },
+                () => verifyFiles().then(() => done(), done)
+            )
         })
 
         it("lib sync version.", () => {
-            cpx.copySync("test-ws/a/**", "test-ws/b", { includeEmptyDirs: true })
+            cpx.copySync("test-ws/a/**", "test-ws/b", {
+                includeEmptyDirs: true,
+            })
             return verifyFiles()
         })
 
         it("command version.", () => {
-            execCommandSync("\"test-ws/a/**\" test-ws/b --include-empty-dirs")
+            execCommandSync('"test-ws/a/**" test-ws/b --include-empty-dirs')
             return verifyFiles()
         })
     })
 
     describe("should not copy specified empty directories with globs when `--include-empty-dirs` option was not given:", () => {
-        beforeEach(() => setupTestDir({
-            "test-ws/a/hello.txt": "Hello",
-            "test-ws/a/b/pen.txt": "A pen",
-            "test-ws/a/c": null,
-        }))
+        beforeEach(() =>
+            setupTestDir({
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/b/pen.txt": "A pen",
+                "test-ws/a/c": null,
+            }))
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -266,7 +287,7 @@ describe("The copy method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            return co(function* () {
+            return co(function*() {
                 yield verifyTestDir({
                     "test-ws/a/hello.txt": "Hello",
                     "test-ws/a/b/pen.txt": "A pen",
@@ -278,9 +299,10 @@ describe("The copy method", () => {
             })
         }
 
-        it("lib async version.", (done) => {
+        it("lib async version.", done => {
             cpx.copy("test-ws/a/**", "test-ws/b", () =>
-                verifyFiles().then(() => done(), done))
+                verifyFiles().then(() => done(), done)
+            )
         })
 
         it("lib sync version.", () => {
@@ -289,19 +311,20 @@ describe("The copy method", () => {
         })
 
         it("command version.", () => {
-            execCommandSync("\"test-ws/a/**\" test-ws/b")
+            execCommandSync('"test-ws/a/**" test-ws/b')
             return verifyFiles()
         })
     })
 
     describe("should copy specified files with globs when `--preserve` option was given:", () => {
-        beforeEach(() => setupTestDir({
-            "test-ws/untouchable.txt": "untouchable",
-            "test-ws/a/hello.txt": "Hello",
-            "test-ws/a/b/this-is.txt": "A pen",
-            "test-ws/a/b/that-is.txt": "A note",
-            "test-ws/a/b/no-copy.dat": "no-copy",
-        }))
+        beforeEach(() =>
+            setupTestDir({
+                "test-ws/untouchable.txt": "untouchable",
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/b/this-is.txt": "A pen",
+                "test-ws/a/b/that-is.txt": "A note",
+                "test-ws/a/b/no-copy.dat": "no-copy",
+            }))
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -323,9 +346,13 @@ describe("The copy method", () => {
             })
         }
 
-        it("lib async version.", (done) => {
-            cpx.copy("test-ws/a/**/*.txt", "test-ws/b", { preserve: true }, () =>
-                verifyFiles().then(() => done(), done))
+        it("lib async version.", done => {
+            cpx.copy(
+                "test-ws/a/**/*.txt",
+                "test-ws/b",
+                { preserve: true },
+                () => verifyFiles().then(() => done(), done)
+            )
         })
 
         it("lib sync version.", () => {
@@ -334,7 +361,7 @@ describe("The copy method", () => {
         })
 
         it("command version.", () => {
-            execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --preserve")
+            execCommandSync('"test-ws/a/**/*.txt" test-ws/b --preserve')
             return verifyFiles()
         })
     })
@@ -347,7 +374,7 @@ describe("The copy method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            return co(function* () {
+            return co(function*() {
                 const srcStat = yield fs.stat("./LICENSE")
                 const dstStat = yield fs.stat("./test-ws/LICENSE")
                 const srcMtime = Math.floor(srcStat.mtime.getTime() / 1000)
@@ -357,9 +384,10 @@ describe("The copy method", () => {
             })
         }
 
-        it("lib async version.", (done) => {
+        it("lib async version.", done => {
             cpx.copy("LICENSE", "test-ws", () =>
-                verifyFiles().then(() => done(), done))
+                verifyFiles().then(() => done(), done)
+            )
         })
 
         it("lib sync version.", () => {
@@ -381,7 +409,7 @@ describe("The copy method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            return co(function* () {
+            return co(function*() {
                 const srcStat = yield fs.stat("./LICENSE")
                 const dstStat = yield fs.stat("./test-ws/LICENSE")
                 const srcMtime = Math.floor(srcStat.mtime.getTime() / 1000)
@@ -393,9 +421,10 @@ describe("The copy method", () => {
             })
         }
 
-        it("lib async version.", (done) => {
+        it("lib async version.", done => {
             cpx.copy("LICENSE", "test-ws", { preserve: true }, () =>
-                verifyFiles().then(() => done(), done))
+                verifyFiles().then(() => done(), done)
+            )
         })
 
         it("lib sync version.", () => {
@@ -410,21 +439,23 @@ describe("The copy method", () => {
     })
 
     describe("should not copy specified files if the source file is older than the destination file, when `--update` option was given:", () => {
-        beforeEach(co.wrap(function* () {
-            yield setupTestDir({
-                "test-ws/a.txt": "newer source",
-                "test-ws/b.txt": "older source",
-                "test-ws/a/a.txt": "older destination",
-                "test-ws/a/b.txt": "newer destination",
-            })
+        beforeEach(
+            co.wrap(function*() {
+                yield setupTestDir({
+                    "test-ws/a.txt": "newer source",
+                    "test-ws/b.txt": "older source",
+                    "test-ws/a/a.txt": "older destination",
+                    "test-ws/a/b.txt": "newer destination",
+                })
 
-            const older = Date.now() / 1000
-            const newer = older + 1
-            yield fs.utimes("test-ws/a.txt", newer, newer)
-            yield fs.utimes("test-ws/b.txt", older, older)
-            yield fs.utimes("test-ws/a/a.txt", older, older)
-            yield fs.utimes("test-ws/a/b.txt", newer, newer)
-        }))
+                const older = Date.now() / 1000
+                const newer = older + 1
+                yield fs.utimes("test-ws/a.txt", newer, newer)
+                yield fs.utimes("test-ws/b.txt", older, older)
+                yield fs.utimes("test-ws/a/a.txt", older, older)
+                yield fs.utimes("test-ws/a/b.txt", newer, newer)
+            })
+        )
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -440,9 +471,10 @@ describe("The copy method", () => {
             })
         }
 
-        it("lib async version.", (done) => {
+        it("lib async version.", done => {
             cpx.copy("test-ws/*.txt", "test-ws/a", { update: true }, () =>
-                verifyFiles().then(() => done(), done))
+                verifyFiles().then(() => done(), done)
+            )
         })
 
         it("lib sync version.", () => {
@@ -451,27 +483,29 @@ describe("The copy method", () => {
         })
 
         it("command version.", () => {
-            execCommandSync("\"test-ws/*.txt\" test-ws/a --update")
+            execCommandSync('"test-ws/*.txt" test-ws/a --update')
             return verifyFiles()
         })
     })
 
     describe("should copy specified files when `--update` option was not given:", () => {
-        beforeEach(co.wrap(function* () {
-            yield setupTestDir({
-                "test-ws/a.txt": "newer source",
-                "test-ws/b.txt": "older source",
-                "test-ws/a/a.txt": "older destination",
-                "test-ws/a/b.txt": "newer destination",
-            })
+        beforeEach(
+            co.wrap(function*() {
+                yield setupTestDir({
+                    "test-ws/a.txt": "newer source",
+                    "test-ws/b.txt": "older source",
+                    "test-ws/a/a.txt": "older destination",
+                    "test-ws/a/b.txt": "newer destination",
+                })
 
-            const older = Date.now() / 1000
-            const newer = older + 1
-            yield fs.utimes("test-ws/a.txt", newer, newer)
-            yield fs.utimes("test-ws/b.txt", older, older)
-            yield fs.utimes("test-ws/a/a.txt", older, older)
-            yield fs.utimes("test-ws/a/b.txt", newer, newer)
-        }))
+                const older = Date.now() / 1000
+                const newer = older + 1
+                yield fs.utimes("test-ws/a.txt", newer, newer)
+                yield fs.utimes("test-ws/b.txt", older, older)
+                yield fs.utimes("test-ws/a/a.txt", older, older)
+                yield fs.utimes("test-ws/a/b.txt", newer, newer)
+            })
+        )
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -487,9 +521,10 @@ describe("The copy method", () => {
             })
         }
 
-        it("lib async version.", (done) => {
+        it("lib async version.", done => {
             cpx.copy("test-ws/*.txt", "test-ws/a", () =>
-                verifyFiles().then(() => done(), done))
+                verifyFiles().then(() => done(), done)
+            )
         })
 
         it("lib sync version.", () => {
@@ -498,7 +533,7 @@ describe("The copy method", () => {
         })
 
         it("command version.", () => {
-            execCommandSync("\"test-ws/*.txt\" test-ws/a")
+            execCommandSync('"test-ws/*.txt" test-ws/a')
             return verifyFiles()
         })
     })
@@ -516,7 +551,9 @@ describe("The copy method", () => {
         }
 
         it("command version.", () => {
-            execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --command \"node ./test/util/upperify.js\"")
+            execCommandSync(
+                '"test-ws/a/**/*.txt" test-ws/b --command "node ./test/util/upperify.js"'
+            )
             return verifyFiles()
         })
     })
@@ -534,7 +571,9 @@ describe("The copy method", () => {
         }
 
         it("command version.", () => {
-            execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --command \"node ./test/util/upperify2.js\"")
+            execCommandSync(
+                '"test-ws/a/**/*.txt" test-ws/b --command "node ./test/util/upperify2.js"'
+            )
             return verifyFiles()
         })
     })
@@ -551,19 +590,27 @@ describe("The copy method", () => {
             return verifyTestDir({ "test-ws/b/hello.txt": "HELLO" })
         }
 
-        it("lib async version.", (done) => {
-            cpx.copy("test-ws/a/**/*.txt", "test-ws/b", { transform: upperify }, () =>
-                verifyFiles().then(() => done(), done))
+        it("lib async version.", done => {
+            cpx.copy(
+                "test-ws/a/**/*.txt",
+                "test-ws/b",
+                { transform: upperify },
+                () => verifyFiles().then(() => done(), done)
+            )
         })
 
         it("should throw an error on lib sync version (cannot use streaming api).", () => {
             assert.throws(() => {
-                cpx.copySync("test-ws/a/**/*.txt", "test-ws/b", { transform: upperify })
+                cpx.copySync("test-ws/a/**/*.txt", "test-ws/b", {
+                    transform: upperify,
+                })
             }, Error)
         })
 
         it("command version.", () => {
-            execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --transform ./test/util/upperify")
+            execCommandSync(
+                '"test-ws/a/**/*.txt" test-ws/b --transform ./test/util/upperify'
+            )
             return verifyFiles()
         })
     })
@@ -580,19 +627,27 @@ describe("The copy method", () => {
             return verifyTestDir({ "test-ws/b/hello.txt": "HELLO" })
         }
 
-        it("lib async version.", (done) => {
-            cpx.copy("test-ws/a/**/*.txt", "test-ws/b", { transform: upperify2 }, () =>
-                verifyFiles().then(() => done(), done))
+        it("lib async version.", done => {
+            cpx.copy(
+                "test-ws/a/**/*.txt",
+                "test-ws/b",
+                { transform: upperify2 },
+                () => verifyFiles().then(() => done(), done)
+            )
         })
 
         it("should throw an error on lib sync version (cannot use streaming api).", () => {
             assert.throws(() => {
-                cpx.copySync("test-ws/a/**/*.txt", "test-ws/b", { transform: upperify2 })
+                cpx.copySync("test-ws/a/**/*.txt", "test-ws/b", {
+                    transform: upperify2,
+                })
             }, Error)
         })
 
         it("command version.", () => {
-            execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --transform ./test/util/upperify2")
+            execCommandSync(
+                '"test-ws/a/**/*.txt" test-ws/b --transform ./test/util/upperify2'
+            )
             return verifyFiles()
         })
     })
@@ -610,17 +665,21 @@ describe("The copy method", () => {
         }
 
         it("command version.", () => {
-            execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b -c \"node ./test/util/appendify.js a\" -t [./test/util/appendify b] -c \"node ./test/util/appendify.js c\" -t [./test/util/appendify d]")
+            execCommandSync(
+                '"test-ws/a/**/*.txt" test-ws/b -c "node ./test/util/appendify.js a" -t [./test/util/appendify b] -c "node ./test/util/appendify.js c" -t [./test/util/appendify d]'
+            )
             return verifyFiles()
         })
     })
 
     describe("should copy as expected even if a specific path didn't include `/`.", () => {
         beforeEach(() => setupTestDir({ "hello.txt": "Hello" }))
-        afterEach(co.wrap(function* () {
-            yield teardownTestDir("hello.txt")
-            yield teardownTestDir("test-ws")
-        }))
+        afterEach(
+            co.wrap(function*() {
+                yield teardownTestDir("hello.txt")
+                yield teardownTestDir("test-ws")
+            })
+        )
 
         /**
          * Verify.
@@ -630,9 +689,10 @@ describe("The copy method", () => {
             return verifyTestDir({ "test-ws/hello.txt": "Hello" })
         }
 
-        it("lib async version.", (done) => {
+        it("lib async version.", done => {
             cpx.copy("hello.txt", "test-ws", () =>
-                verifyFiles().then(() => done(), done))
+                verifyFiles().then(() => done(), done)
+            )
         })
 
         it("lib sync version.", () => {
@@ -647,7 +707,8 @@ describe("The copy method", () => {
     })
 
     describe("should copy specified files with globs even if there are parentheses:", () => {
-        beforeEach(() => setupTestDir({ "test-ws/a(paren)/hello.txt": "Hello" }))
+        beforeEach(() =>
+            setupTestDir({ "test-ws/a(paren)/hello.txt": "Hello" }))
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -661,9 +722,10 @@ describe("The copy method", () => {
             })
         }
 
-        it("lib async version.", (done) => {
+        it("lib async version.", done => {
             cpx.copy("test-ws/a(paren)/**/*.txt", "test-ws/b", () =>
-                verifyFiles().then(() => done(), done))
+                verifyFiles().then(() => done(), done)
+            )
         })
 
         it("lib sync version.", () => {
@@ -672,7 +734,7 @@ describe("The copy method", () => {
         })
 
         it("command version.", () => {
-            execCommandSync("\"test-ws/a(paren)/**/*.txt\" test-ws/b")
+            execCommandSync('"test-ws/a(paren)/**/*.txt" test-ws/b')
             return verifyFiles()
         })
     })

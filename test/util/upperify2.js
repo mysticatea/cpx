@@ -51,7 +51,6 @@ function toUpperCase() {
 
 if (require.main === module) {
     process.stdin.pipe(toUpperCase()).pipe(process.stdout)
-}
-else {
+} else {
     module.exports = toUpperCase
 }

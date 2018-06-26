@@ -18,14 +18,18 @@ const execCommandSync = require("./util/util").execCommandSync
 
 describe("[misc]", () => {
     it("should throw error if invalid option was given.", () => {
-        const result = execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --invalid")
+        const result = execCommandSync(
+            '"test-ws/a/**/*.txt" test-ws/b --invalid'
+        )
 
         assert(result.code === 1)
         assert(result.stderr === "Unknown option(s): --invalid\n")
     })
 
     it("should throw error if invalid options were given.", () => {
-        const result = execCommandSync("\"test-ws/a/**/*.txt\" test-ws/b --invalid --foo --bar")
+        const result = execCommandSync(
+            '"test-ws/a/**/*.txt" test-ws/b --invalid --foo --bar'
+        )
 
         assert(result.code === 1)
         assert(result.stderr === "Unknown option(s): --invalid, --foo, --bar\n")

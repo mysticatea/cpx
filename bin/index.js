@@ -63,14 +63,11 @@ if (unknowns.size > 0) {
 // Main.
 else if (args.help) {
     require("./help")()
-}
-else if (args.version) {
+} else if (args.version) {
     require("./version")()
-}
-else if (source == null || outDir == null || args._.length > 2) {
+} else if (source == null || outDir == null || args._.length > 2) {
     require("./help")()
     process.exitCode = 1
-}
-else {
+} else {
     require("./main")(source, outDir, args)
 }

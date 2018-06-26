@@ -26,9 +26,9 @@ const execSync = require("shelljs").exec
  * @param {number} ms The duration in milliseconds to wait.
  * @returns {Promise<void>} The promise which will go fulfilled after the duration.
  */
-const delay = module.exports.delay = function delay(ms) {
+const delay = (module.exports.delay = function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
-}
+})
 
 /**
  * Writes specific data to a specific file.
@@ -37,10 +37,13 @@ const delay = module.exports.delay = function delay(ms) {
  * @param {string} contentText - A text to write.
  * @returns {Promise<void>} The promise which will go fulfilled after done.
  */
-const writeFile = module.exports.writeFile = co.wrap(function* writeFile(path, contentText) {
+const writeFile = (module.exports.writeFile = co.wrap(function* writeFile(
+    path,
+    contentText
+) {
     yield fs.ensureDir(dirname(path))
     yield fs.writeFile(path, contentText)
-})
+}))
 
 /**
  * Removes a specific file.
@@ -58,9 +61,9 @@ module.exports.removeFile = function removeFile(path) {
  * @param {string} path - A path to read.
  * @returns {Promise<string|null>} The content of the file, or `null` if not found.
  */
-const readFile = module.exports.content = function content(path) {
+const readFile = (module.exports.content = function content(path) {
     return fs.readFile(path, { encoding: "utf8" }).catch(() => null)
-}
+})
 
 /**
  * Sets up test files.
@@ -70,10 +73,12 @@ const readFile = module.exports.content = function content(path) {
  */
 module.exports.setupTestDir = function setupTestDir(dataset) {
     return Promise.all(
-        Object.keys(dataset).map(path =>
-            (dataset[path] == null)
-                ? fs.ensureDir(path)
-                : writeFile(path, dataset[path]))
+        Object.keys(dataset).map(
+            path =>
+                dataset[path] == null
+                    ? fs.ensureDir(path)
+                    : writeFile(path, dataset[path])
+        )
     ).then(() => delay(250))
 }
 
