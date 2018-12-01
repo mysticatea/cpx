@@ -36,6 +36,7 @@ Options:
                               Use together '--watch' option.
     -p, --preserve            The flag to copy attributes of files.
                               This attributes are uid, gid, atime, and mtime.
+    -r --directory            The Flag to copy directory
     -t, --transform <name>    A module name to transform each file. cpx lookups
                                 the specified name via "require()".
     -u, --update              The flag to not overwrite files on destination if

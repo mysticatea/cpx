@@ -26,6 +26,7 @@ const args = subarg(process.argv.slice(2), {
         includeEmptyDirs: "include-empty-dirs",
         L: "dereference",
         p: "preserve",
+        r: "directory",
         t: "transform",
         u: "update",
         v: "verbose",
