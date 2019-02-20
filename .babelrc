@@ -1,4 +1,9 @@
 {
     "presets": ["power-assert"],
-    "sourceMaps": "inline"
+    "sourceMaps": "inline",
+    "env": {
+        "test": {
+            "plugins": [ "istanbul" ]
+        }
+    }
 }
