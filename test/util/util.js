@@ -73,11 +73,10 @@ const readFile = (module.exports.content = function content(path) {
  */
 module.exports.setupTestDir = function setupTestDir(dataset) {
     return Promise.all(
-        Object.keys(dataset).map(
-            path =>
-                dataset[path] == null
-                    ? fs.ensureDir(path)
-                    : writeFile(path, dataset[path])
+        Object.keys(dataset).map(path =>
+            dataset[path] == null
+                ? fs.ensureDir(path)
+                : writeFile(path, dataset[path])
         )
     ).then(() => delay(250))
 }
