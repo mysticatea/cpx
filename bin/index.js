@@ -51,8 +51,8 @@ const args = subarg(process.argv.slice(2), {
         }
     },
 })
-const source = args._[0]
-const outDir = args._[1]
+const outDir = args._.pop()
+const sources = args._
 
 // Validate Options.
 if (unknowns.size > 0) {
@@ -65,9 +65,10 @@ else if (args.help) {
     require("./help")()
 } else if (args.version) {
     require("./version")()
-} else if (source == null || outDir == null || args._.length > 2) {
+} else if (!sources.length || outDir == null || args._.length > 2) {
     require("./help")()
     process.exitCode = 1
 } else {
-    require("./main")(source, outDir, args)
+    const main = require("./main")
+    sources.forEach(source => main(source, outDir, args))
 }
