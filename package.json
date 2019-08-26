@@ -6,7 +6,9 @@
     "node": ">=6.5"
   },
   "main": "lib/index.js",
-  "bin": { "cpx": "bin/index.js" },
+  "bin": {
+    "cpx": "bin/index.js"
+  },
   "files": [
     "bin",
     "lib"
@@ -19,8 +21,8 @@
     "postversion": "git push && git push --tags",
     "pretest": "npm run -s lint",
     "preversion": "npm test",
-    "test": "nyc --require babel-register npm run -s _mocha",
-    "watch": "npm run -s _mocha -- --require babel-register --watch --growl"
+    "test": "nyc --require @babel/register npm run -s _mocha",
+    "watch": "npm run -s _mocha -- --require @babel/register --watch --growl"
   },
   "dependencies": {
     "co": "^4.6.0",
@@ -37,17 +39,18 @@
     "subarg": "^1.0.0"
   },
   "devDependencies": {
-    "@mysticatea/eslint-plugin": "^5.0.1",
-    "babel-preset-power-assert": "^2.0.0",
-    "babel-register": "^6.26.0",
-    "eslint": "^5.0.1",
-    "mocha": "^5.2.0",
-    "nyc": "12.0.2",
-    "opener": "^1.4.3",
-    "p-event": "^2.0.0",
-    "power-assert": "^1.6.0",
-    "rimraf": "^2.6.2",
-    "shelljs": "^0.8.2",
+    "@babel/core": "^7.5.5",
+    "@babel/register": "^7.5.5",
+    "@mysticatea/eslint-plugin": "^11.0.0",
+    "babel-preset-power-assert": "^3.0.0",
+    "eslint": "^6.2.2",
+    "mocha": "^6.2.0",
+    "nyc": "14.1.1",
+    "opener": "^1.5.1",
+    "p-event": "^4.1.0",
+    "power-assert": "^1.6.1",
+    "rimraf": "^3.0.0",
+    "shelljs": "^0.8.3",
     "through": "^2.3.8"
   },
   "repository": {

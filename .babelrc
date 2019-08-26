@@ -1,4 +1,4 @@
 {
     "presets": ["power-assert"],
-    "sourceMaps": "inline"
+    "sourceMaps": true
 }
