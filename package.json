@@ -14,7 +14,6 @@
   "scripts": {
     "_mocha": "_mocha \"test/*.js\" --timeout 15000",
     "clean": "rimraf .nyc_output coverage test-ws",
-    "codecov": "nyc report -r lcovonly && codecov",
     "coverage": "nyc report -r lcov && opener coverage/lcov-report/index.html",
     "lint": "eslint bin lib test",
     "postversion": "git push && git push --tags",
@@ -41,7 +40,6 @@
     "@mysticatea/eslint-plugin": "^5.0.1",
     "babel-preset-power-assert": "^2.0.0",
     "babel-register": "^6.26.0",
-    "codecov": "^3.0.2",
     "eslint": "^5.0.1",
     "mocha": "^5.2.0",
     "nyc": "12.0.2",
