@@ -1,6 +1,6 @@
 {
   "name": "cpx2",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "description": "Copy file globs, watching for changes.",
   "engines": {
     "node": ">=6.5"
