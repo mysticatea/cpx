@@ -39,41 +39,41 @@ describe("[misc]", () => {
         const result = execCommandSync("")
 
         assert(result.code === 1)
-        assert(/Usage:/.test(result.stdout))
+        assert(/Usage:/u.test(result.stdout))
     })
 
     it("should throw error and show help if <dest> was lacking.", () => {
         const result = execCommandSync("test-ws/**/*.js")
 
         assert(result.code === 1)
-        assert(/Usage:/.test(result.stdout))
+        assert(/Usage:/u.test(result.stdout))
     })
 
     it("should show help if --help option was given.", () => {
         const result = execCommandSync("--help")
 
         assert(result.code === 0)
-        assert(/Usage:/.test(result.stdout))
+        assert(/Usage:/u.test(result.stdout))
     })
 
     it("should show help if -h option was given.", () => {
         const result = execCommandSync("--help")
 
         assert(result.code === 0)
-        assert(/Usage:/.test(result.stdout))
+        assert(/Usage:/u.test(result.stdout))
     })
 
     it("should show version if --version option was given.", () => {
         const result = execCommandSync("--version")
 
         assert(result.code === 0)
-        assert(/^v[0-9]+\.[0-9]+\.[0-9]+\n$/.test(result.stdout))
+        assert(/^v[0-9]+\.[0-9]+\.[0-9]+\n$/u.test(result.stdout))
     })
 
     it("should show version if -V option was given.", () => {
         const result = execCommandSync("-V")
 
         assert(result.code === 0)
-        assert(/^v[0-9]+\.[0-9]+\.[0-9]+\n$/.test(result.stdout))
+        assert(/^v[0-9]+\.[0-9]+\.[0-9]+\n$/u.test(result.stdout))
     })
 })

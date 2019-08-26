@@ -18,7 +18,7 @@ module.exports = function help() {
     console.log(`
 Usage: cpx <source> <dest> [options]
 
-    Copy files, watching for changes.
+    cpx2: Copy files, watching for changes.
 
         <source>  The glob of target files.
         <dest>    The path of a destination directory.
@@ -51,6 +51,9 @@ Examples:
     cpx "src/**/*.css" app --watch --verbose
 
 See Also:
-    https://github.com/mysticatea/cpx
+    https://github.com/bcomnes/cpx2
+
+Thanks To:
+    https://github.com/mysticatea/cpx  Maybe one day we can upstream this maintenance work.
 `)
 }

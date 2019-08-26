@@ -100,7 +100,7 @@ module.exports.teardownTestDir = function teardownTestDir(testRootPath) {
 module.exports.verifyTestDir = co.wrap(function* verifyTestDir(dataset) {
     for (const path of Object.keys(dataset)) {
         const content = yield readFile(path)
-        assert.equal(content, dataset[path])
+        assert.strictEqual(content, dataset[path])
     }
 })
 
