@@ -44,7 +44,7 @@ describe("The watch method", () => {
                 command.stdin.write("KILL")
                 yield pEvent(command, "exit")
                 yield teardownTestDir("test-ws")
-                command = null
+                command = null // eslint-disable-line require-atomic-updates
             } else {
                 yield teardownTestDir("test-ws")
             }
@@ -652,7 +652,7 @@ describe("The watch method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            assert.throws(() => fs.statSync("test-ws/b/c"), /ENOENT/)
+            assert.throws(() => fs.statSync("test-ws/b/c"), /ENOENT/u)
             return verifyTestDir({
                 "test-ws/b/hello.txt": "Hello",
                 "test-ws/b/b/hello.txt": "Hello",

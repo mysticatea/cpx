@@ -299,7 +299,7 @@ describe("The copy method", () => {
                     "test-ws/b/b/pen.txt": "A pen",
                 })
                 assert(fs.statSync("test-ws/a/c").isDirectory())
-                assert.throws(() => fs.statSync("test-ws/b/c"), /ENOENT/)
+                assert.throws(() => fs.statSync("test-ws/b/c"), /ENOENT/u)
             })
         }
 
