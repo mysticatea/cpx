@@ -1,20 +1,20 @@
-# cpx
+# cpx2
 
-[![npm version](https://img.shields.io/npm/v/cpx.svg)](https://www.npmjs.com/package/cpx)
-[![Downloads/month](https://img.shields.io/npm/dm/cpx.svg)](http://www.npmtrends.com/cpx)
-[![Build Status](https://travis-ci.org/mysticatea/cpx.svg?branch=master)](https://travis-ci.org/mysticatea/cpx)
-[![codecov](https://codecov.io/gh/mysticatea/cpx/branch/master/graph/badge.svg)](https://codecov.io/gh/mysticatea/cpx)
-[![Dependency Status](https://david-dm.org/mysticatea/cpx.svg)](https://david-dm.org/mysticatea/cpx)
+[![npm version](https://img.shields.io/npm/v/cpx2.svg)](https://www.npmjs.com/package/cpx2)
+[![Downloads/month](https://img.shields.io/npm/dm/cpx2.svg)](http://www.npmtrends.com/cpx2)
+[![Build Status](https://travis-ci.org/bcomnes/cpx2.svg?branch=master)](https://travis-ci.org/bcomnes/cpx2)
+[![Dependency Status](https://david-dm.org/bcomnes/cpx2.svg)](https://david-dm.org/bcomnes/cpx2)
 
 Copy file globs, watching for changes.
 
 This module provides a CLI tool like `cp`, but with watching.
 
+This is a maintained fork of [mysticatea/cpx](https://github.com/mysticatea/cpx).  It retains the `cpx` bin name, so it can act as a drop-in replacement.
 
 ## Installation
 
 ```
-npm install cpx
+npm install cpx2
 ```
 
 - Requires Node.js `>=6.5`.
@@ -91,7 +91,7 @@ It maybe can use to add header comment, to optimize images, or etc...
 You can use this module as a node module.
 
 ```js
-var cpx = require("cpx");
+var cpx = require("cpx2");
 ```
 
 ### cpx.copy
@@ -148,7 +148,7 @@ Arguments is same as `cpx.copy`.
 
 ## Changelog
 
-[GitHub Releases](https://github.com/mysticatea/cpx/releases)
+[GitHub Releases](https://github.com/bcomnes/cpx2/releases)
 
 ## Contributing
 

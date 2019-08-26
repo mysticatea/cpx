@@ -6,7 +6,7 @@
     "node": ">=6.5"
   },
   "main": "lib/index.js",
-  "bin": "bin/index.js",
+  "bin": { "cpx": "bin/index.js" },
   "files": [
     "bin",
     "lib"
@@ -54,7 +54,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mysticatea/cpx.git"
+    "url": "https://github.com/bcomnes/cpx2.git"
   },
   "keywords": [
     "cp",
@@ -73,9 +73,12 @@
     "files"
   ],
   "author": "Toru Nagashima",
+  "contributors": [
+    "Bret Comnes <bcomnes@gmail.com> (https://bret.io)"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mysticatea/cpx/issues"
+    "url": "https://github.com/bcomnes/cpx2/issues"
   },
-  "homepage": "https://github.com/mysticatea/cpx"
+  "homepage": "https://github.com/bcomnes/cpx2"
 }
