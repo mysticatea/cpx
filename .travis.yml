@@ -5,9 +5,5 @@ os:
 
 language: node_js
 node_js:
-  - "6.5"
-  - "8"
-  - "10"
-
-after_success:
-  - npm run codecov
+  - node
+  - lts/*
