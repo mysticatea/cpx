@@ -73,11 +73,10 @@ const readFile = (module.exports.content = function content(path) {
  */
 module.exports.setupTestDir = function setupTestDir(dataset) {
     return Promise.all(
-        Object.keys(dataset).map(
-            path =>
-                dataset[path] == null
-                    ? fs.ensureDir(path)
-                    : writeFile(path, dataset[path])
+        Object.keys(dataset).map(path =>
+            dataset[path] == null
+                ? fs.ensureDir(path)
+                : writeFile(path, dataset[path])
         )
     ).then(() => delay(250))
 }
@@ -101,7 +100,7 @@ module.exports.teardownTestDir = function teardownTestDir(testRootPath) {
 module.exports.verifyTestDir = co.wrap(function* verifyTestDir(dataset) {
     for (const path of Object.keys(dataset)) {
         const content = yield readFile(path)
-        assert.equal(content, dataset[path])
+        assert.strictEqual(content, dataset[path])
     }
 })
 
@@ -111,7 +110,7 @@ module.exports.verifyTestDir = co.wrap(function* verifyTestDir(dataset) {
  * @returns {child_process.ChildProcess} A child process object.
  */
 module.exports.execCommand = function execCommand(args) {
-    return exec(`node test/util/bin.js ${args}`)
+    return exec(`${process.execPath} test/util/bin.js ${args}`)
 }
 
 /**
@@ -120,5 +119,7 @@ module.exports.execCommand = function execCommand(args) {
  * @returns {void}
  */
 module.exports.execCommandSync = function execCommandSync(args) {
-    return execSync(`node test/util/bin.js ${args}`, { silent: true })
+    return execSync(`${process.execPath} test/util/bin.js ${args}`, {
+        silent: true,
+    })
 }
