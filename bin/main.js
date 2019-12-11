@@ -28,9 +28,9 @@ const Watcher = require("../lib/utils/watcher")
 // Helpers
 //------------------------------------------------------------------------------
 
-const ABS_OR_REL = /^[./]/
-const C_OR_COMMAND = /^(?:-c|--command)$/
-const T_OR_TRANSFORM = /^(?:-t|--transform)$/
+const ABS_OR_REL = /^[./]/u
+const C_OR_COMMAND = /^(?:-c|--command)$/u
+const T_OR_TRANSFORM = /^(?:-t|--transform)$/u
 
 //------------------------------------------------------------------------------
 // Exports

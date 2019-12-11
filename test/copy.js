@@ -35,7 +35,8 @@ describe("The copy method", () => {
                 "test-ws/a/b/this-is.txt": "A pen",
                 "test-ws/a/b/that-is.txt": "A note",
                 "test-ws/a/b/no-copy.dat": "no-copy",
-            }))
+            })
+        )
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -87,7 +88,8 @@ describe("The copy method", () => {
                 "test-ws/a/b/no-copy.dat": "no-copy",
                 "test-ws/b/b/remove.txt": "remove",
                 "test-ws/b/b/no-remove.dat": "no-remove",
-            }))
+            })
+        )
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -231,7 +233,8 @@ describe("The copy method", () => {
                 "test-ws/a/hello.txt": "Hello",
                 "test-ws/a/b/pen.txt": "A pen",
                 "test-ws/a/c": null,
-            }))
+            })
+        )
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -279,7 +282,8 @@ describe("The copy method", () => {
                 "test-ws/a/hello.txt": "Hello",
                 "test-ws/a/b/pen.txt": "A pen",
                 "test-ws/a/c": null,
-            }))
+            })
+        )
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -295,7 +299,7 @@ describe("The copy method", () => {
                     "test-ws/b/b/pen.txt": "A pen",
                 })
                 assert(fs.statSync("test-ws/a/c").isDirectory())
-                assert.throws(() => fs.statSync("test-ws/b/c"), /ENOENT/)
+                assert.throws(() => fs.statSync("test-ws/b/c"), /ENOENT/u)
             })
         }
 
@@ -324,7 +328,8 @@ describe("The copy method", () => {
                 "test-ws/a/b/this-is.txt": "A pen",
                 "test-ws/a/b/that-is.txt": "A note",
                 "test-ws/a/b/no-copy.dat": "no-copy",
-            }))
+            })
+        )
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -673,7 +678,8 @@ describe("The copy method", () => {
 
     describe("should copy specified files with globs even if there are parentheses:", () => {
         beforeEach(() =>
-            setupTestDir({ "test-ws/a(paren)/hello.txt": "Hello" }))
+            setupTestDir({ "test-ws/a(paren)/hello.txt": "Hello" })
+        )
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
