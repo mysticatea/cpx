@@ -115,7 +115,8 @@ describe("The watch method", () => {
                 "test-ws/a/b/this-is.txt": "A pen",
                 "test-ws/a/b/that-is.txt": "A note",
                 "test-ws/a/b/no-copy.dat": "no-copy",
-            }))
+            })
+        )
 
         /**
          * Verify.
@@ -267,7 +268,8 @@ describe("The watch method", () => {
                 "test-ws/a/b/this-is.txt": "A pen",
                 "test-ws/a/b/that-is.txt": "A note",
                 "test-ws/a/b/no-copy.dat": "no-copy",
-            }))
+            })
+        )
 
         /**
          * Verify.
@@ -319,7 +321,8 @@ describe("The watch method", () => {
                 "test-ws/a/b/no-copy.dat": "no-copy",
                 "test-ws/b/b/remove.txt": "remove",
                 "test-ws/b/b/no-remove.dat": "no-remove",
-            }))
+            })
+        )
 
         /**
          * Verify.
@@ -373,7 +376,8 @@ describe("The watch method", () => {
                 "test-ws/a/b/this-is.txt": "A pen",
                 "test-ws/a/b/that-is.txt": "A note",
                 "test-ws/a/b/no-copy.dat": "no-copy",
-            }))
+            })
+        )
 
         /**
          * Verify.
@@ -540,7 +544,8 @@ describe("The watch method", () => {
             setupTestDir({
                 "test-ws/a/hello.txt": "Hello",
                 "test-ws/a/hello.dat": "Hello",
-            }))
+            })
+        )
 
         /**
          * Verify.
@@ -591,7 +596,8 @@ describe("The watch method", () => {
             setupTestDir({
                 "test-ws/a/hello.txt": "Hello",
                 "test-ws/a/b/hello.txt": "Hello",
-            }))
+            })
+        )
 
         /**
          * Verify.
@@ -638,7 +644,8 @@ describe("The watch method", () => {
                 "test-ws/a/hello.txt": "Hello",
                 "test-ws/a/b/hello.txt": "Hello",
                 "test-ws/a/c": null,
-            }))
+            })
+        )
 
         /**
          * Verify.
@@ -684,7 +691,8 @@ describe("The watch method", () => {
             setupTestDir({
                 "test-ws/a/hello.txt": "Hello",
                 "test-ws/a/b/hello.txt": "Hello",
-            }))
+            })
+        )
 
         /**
          * Verify.
@@ -730,7 +738,8 @@ describe("The watch method", () => {
             setupTestDir({
                 //
                 "test-ws/a(paren)/hello.txt": "Hello",
-            }))
+            })
+        )
 
         /**
          * Verify.
