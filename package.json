@@ -44,7 +44,7 @@
     "gh-release": "^4.0.2",
     "@babel/core": "^7.5.5",
     "@babel/register": "^7.5.5",
-    "@mysticatea/eslint-plugin": "^11.0.0",
+    "@mysticatea/eslint-plugin": "^13.0.0",
     "babel-preset-power-assert": "^3.0.0",
     "eslint": "^7.9.0",
     "mocha": "^8.1.3",

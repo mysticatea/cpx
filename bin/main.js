@@ -72,7 +72,6 @@ module.exports = function main(source, outDir, args) {
     const transforms = []
         .concat(args.transform)
         .filter(Boolean)
-        // eslint-disable-next-line array-callback-return, consistent-return
         .map(arg => {
             if (typeof arg === "string") {
                 return { name: arg, argv: null }
