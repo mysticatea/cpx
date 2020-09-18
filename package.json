@@ -21,7 +21,6 @@
     "coverage": "nyc report -r lcov && opener coverage/lcov-report/index.html",
     "lint": "eslint bin lib test",
     "pretest": "npm run -s lint",
-    "preversion": "npm test",
     "test": "nyc --require @babel/register npm run -s _mocha",
     "watch": "npm run -s _mocha -- --require @babel/register --watch --growl"
   },

@@ -3,7 +3,6 @@
 [![npm version](https://img.shields.io/npm/v/cpx2.svg)](https://www.npmjs.com/package/cpx2)
 [![Downloads/month](https://img.shields.io/npm/dm/cpx2.svg)](http://www.npmtrends.com/cpx2)
 [![Build Status](https://travis-ci.org/bcomnes/cpx2.svg?branch=master)](https://travis-ci.org/bcomnes/cpx2)
-[![Dependency Status](https://david-dm.org/bcomnes/cpx2.svg)](https://david-dm.org/bcomnes/cpx2)
 
 Copy file globs, watching for changes.
 
