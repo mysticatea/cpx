@@ -138,6 +138,9 @@ module.exports = function main(source, outDir, args) {
     }
 
     if (args.watch) {
+        process.stdin.on('end', () => process.exit(0))
+        process.stdin.resume()
+
         if (options.initialCopy) {
             log()
             log(`Copy: ${source} --> ${outDir}`)
