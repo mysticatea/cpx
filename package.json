@@ -3,7 +3,7 @@
   "version": "3.0.2",
   "description": "Copy file globs, watching for changes.",
   "engines": {
-    "node": ">=6.5"
+    "node": ">=14"
   },
   "main": "lib/index.js",
   "bin": {
