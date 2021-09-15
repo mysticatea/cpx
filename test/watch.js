@@ -539,6 +539,61 @@ describe("The watch method", () => {
         })
     }
 
+    const patternsWithIgnore = [
+        {
+            description: "should ignore ignored files:",
+            initialFiles: {
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/node_modules/dont-copy.txt": "no-copy",
+            },
+            action() {
+                return writeFile("test-ws/a/b/added.txt", "added")
+            },
+            verify: {
+                "test-ws/b/hello.txt": "Hello",
+                "test-ws/b/b/added.txt": "added",
+                "test-ws/a/node_modules/dont-copy.txt": "no-copy",
+                "test-ws/b/node_modules/dont-copy.txt": null,
+            },
+            wait: waitForCopy,
+            ignore: ["node_modules"],
+        },
+    ]
+    for (const pattern of patternsWithIgnore) {
+        //eslint-disable-next-line no-loop-func
+        ;(pattern.only ? describe.only : describe)(pattern.description, () => {
+            beforeEach(() => setupTestDir(pattern.initialFiles))
+
+            it(
+                "lib version.",
+                co.wrap(function*() {
+                    watcher = cpx.watch("test-ws/a/**/*.txt", "test-ws/b", {
+                        ignore: pattern.ignore,
+                    })
+                    yield waitForReady()
+                    yield pattern.action()
+                    yield pattern.wait()
+                    yield verifyTestDir(pattern.verify)
+                })
+            )
+
+            it(
+                "command version.",
+                co.wrap(function*() {
+                    command = execCommand(
+                        `"test-ws/a/**/*.txt" test-ws/b --watch --verbose --ignore ${pattern.ignore.join(
+                            ","
+                        )}`
+                    )
+                    yield waitForReady()
+                    yield pattern.action()
+                    yield pattern.wait()
+                    yield verifyTestDir(pattern.verify)
+                })
+            )
+        })
+    }
+
     describe("should do reactions of multiple events:", () => {
         beforeEach(() =>
             setupTestDir({

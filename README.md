@@ -33,6 +33,8 @@ Options:
     -c, --command <command>   A command text to transform each file.
     -C, --clean               Clean files that matches <source> like pattern in
                               <dest> directory before the first copying.
+    -i  --ignore              A comma separated list of gitignore style ignore
+                              patterns.
     -L, --dereference         Follow symbolic links when copying from them.
     -h, --help                Print usage information.
     --include-empty-dirs      The flag to copy empty directories which is
@@ -110,6 +112,7 @@ cpx.copy(source, dest, callback)
   - **options.preserve** `{boolean}` -- The flag to copy uid, gid, atime, and mtime of files. Default: `false`.
   - **options.transform** `{((filepath: string) => stream.Transform)[]}` -- Functions that creates a `stream.Transform` object to transform each copying file.
   - **options.update** `{boolean}` -- The flag to not overwrite files on destination if the source file is older. Default: `false`.
+  - **options.ignore** `{string|Array<string>}` -- A gitignore style string or array of strings that make ignoring directory patterns easier. Default: []
 - **callback** `{(err: Error|null) => void}` -- A function that is called at done.
 
 Copy files that matches with `source` glob to `dest` directory.

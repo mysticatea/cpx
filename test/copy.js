@@ -78,6 +78,72 @@ describe("The copy method", () => {
         })
     })
 
+    describe("should copy specified files with globs and ignore strings:", () => {
+        beforeEach(() =>
+            setupTestDir({
+                "test-ws/untouchable.txt": "untouchable",
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/b/this-is.txt": "A pen",
+                "test-ws/a/b/that-is.txt": "A note",
+                "test-ws/a/b/no-copy.dat": "no-copy",
+                "test-ws/a/node_modules/no-copy.txt": "no-copy",
+                "test-ws/a/vscode/no-copy.txt": "no-copy",
+            })
+        )
+        afterEach(() => teardownTestDir("test-ws"))
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            return verifyTestDir({
+                "test-ws/untouchable.txt": "untouchable",
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/b/this-is.txt": "A pen",
+                "test-ws/a/b/that-is.txt": "A note",
+                "test-ws/a/b/no-copy.dat": "no-copy",
+                "test-ws/a/node_modules/no-copy.txt": "no-copy",
+                "test-ws/a/vscode/no-copy.txt": "no-copy",
+                "test-ws/b/untouchable.txt": null,
+                "test-ws/b/hello.txt": "Hello",
+                "test-ws/b/b/this-is.txt": "A pen",
+                "test-ws/b/b/that-is.txt": "A note",
+                "test-ws/b/b/no-copy.dat": null,
+                "test-ws/b/vscode/no-copy.txt": null,
+            })
+        }
+
+        const ignore = ["node_modules", "vscode"]
+
+        it("lib async version.", done => {
+            cpx.copy("test-ws/a/**/*.txt", "test-ws/b", { ignore }, () =>
+                verifyFiles().then(() => done(), done)
+            )
+        })
+
+        it("lib async version (promise).", () =>
+            cpx
+                .copy("test-ws/a/**/*.txt", "test-ws/b", {
+                    ignore,
+                })
+                .then(verifyFiles))
+
+        it("lib sync version.", () => {
+            cpx.copySync("test-ws/a/**/*.txt", "test-ws/b", {
+                ignore,
+            })
+            return verifyFiles()
+        })
+
+        it("command version.", () => {
+            execCommandSync(
+                `"test-ws/a/**/*.txt" test-ws/b --ignore ${ignore.join(",")}`
+            )
+            return verifyFiles()
+        })
+    })
+
     describe("should clean and copy specified files with globs when give clean option:", () => {
         beforeEach(() =>
             setupTestDir({
