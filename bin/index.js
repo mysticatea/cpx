@@ -24,6 +24,7 @@ const args = subarg(process.argv.slice(2), {
         C: "clean",
         h: "help",
         includeEmptyDirs: "include-empty-dirs",
+        i: "ignore",
         L: "dereference",
         p: "preserve",
         t: "transform",
@@ -44,6 +45,7 @@ const args = subarg(process.argv.slice(2), {
         "version",
         "watch",
     ],
+    string: ["ignore"],
     default: { initial: true },
     unknown(arg) {
         if (arg[0] === "-") {

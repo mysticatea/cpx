@@ -28,6 +28,8 @@ Options:
     -c, --command <command>   A command text to transform each file.
     -C, --clean               Clean files that matches <source> like pattern in
                               <dest> directory before the first copying.
+    -i  --ignore              A comma separated list of gitignore style ignore
+                              patterns.
     -L, --dereference         Follow symbolic links when copying from them.
     -h, --help                Print usage information.
     --include-empty-dirs      The flag to copy empty directories which is
