@@ -11,7 +11,6 @@
 
 const assert = require("assert")
 const path = require("path")
-const co = require("co")
 const fs = require("fs-extra")
 const cpx = require("..")
 const util = require("./util/util")
@@ -197,19 +196,17 @@ describe("The copy method", () => {
     })
 
     describe("should copy files inside of symlink directory when `--dereference` option was specified:", () => {
-        beforeEach(
-            co.wrap(function*() {
-                yield setupTestDir({
-                    "test-ws/src/a/hello.txt": "Symlinked",
-                    "test-ws/a/hello.txt": "Hello",
-                })
-                yield fs.symlink(
-                    path.resolve("test-ws/src"),
-                    path.resolve("test-ws/a/link"),
-                    "junction"
-                )
+        beforeEach(async () => {
+            await setupTestDir({
+                "test-ws/src/a/hello.txt": "Symlinked",
+                "test-ws/a/hello.txt": "Hello",
             })
-        )
+            await fs.symlink(
+                path.resolve("test-ws/src"),
+                path.resolve("test-ws/a/link"),
+                "junction"
+            )
+        })
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -248,19 +245,17 @@ describe("The copy method", () => {
     })
 
     describe("should not copy files inside of symlink directory when `--dereference` option was not specified:", () => {
-        beforeEach(
-            co.wrap(function*() {
-                yield setupTestDir({
-                    "test-ws/src/a/hello.txt": "Symlinked",
-                    "test-ws/a/hello.txt": "Hello",
-                })
-                yield fs.symlink(
-                    path.resolve("test-ws/src"),
-                    path.resolve("test-ws/a/link"),
-                    "junction"
-                )
+        beforeEach(async () => {
+            await setupTestDir({
+                "test-ws/src/a/hello.txt": "Symlinked",
+                "test-ws/a/hello.txt": "Hello",
             })
-        )
+            await fs.symlink(
+                path.resolve("test-ws/src"),
+                path.resolve("test-ws/a/link"),
+                "junction"
+            )
+        })
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -308,8 +303,8 @@ describe("The copy method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            return co(function*() {
-                yield verifyTestDir({
+            async function run() {
+                await verifyTestDir({
                     "test-ws/a/hello.txt": "Hello",
                     "test-ws/a/b/pen.txt": "A pen",
                     "test-ws/b/hello.txt": "Hello",
@@ -317,7 +312,9 @@ describe("The copy method", () => {
                 })
                 assert(fs.statSync("test-ws/a/c").isDirectory())
                 assert(fs.statSync("test-ws/b/c").isDirectory())
-            })
+            }
+
+            return run()
         }
 
         it("lib async version.", done => {
@@ -357,8 +354,8 @@ describe("The copy method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            return co(function*() {
-                yield verifyTestDir({
+            async function run() {
+                await verifyTestDir({
                     "test-ws/a/hello.txt": "Hello",
                     "test-ws/a/b/pen.txt": "A pen",
                     "test-ws/b/hello.txt": "Hello",
@@ -366,7 +363,9 @@ describe("The copy method", () => {
                 })
                 assert(fs.statSync("test-ws/a/c").isDirectory())
                 assert.throws(() => fs.statSync("test-ws/b/c"), /ENOENT/u)
-            })
+            }
+
+            return run()
         }
 
         it("lib async version.", done => {
@@ -445,16 +444,18 @@ describe("The copy method", () => {
          * @returns {void}
          */
         function verifyFiles() {
-            return co(function*() {
-                const srcStat = yield fs.stat("./LICENSE")
-                const dstStat = yield fs.stat("./test-ws/LICENSE")
+            async function run() {
+                const srcStat = await fs.stat("./LICENSE")
+                const dstStat = await fs.stat("./test-ws/LICENSE")
                 const srcMtime = Math.floor(srcStat.mtime.getTime() / 1000)
                 const dstMtime = Math.floor(dstStat.mtime.getTime() / 1000)
 
                 assert(srcStat.uid === dstStat.uid)
                 assert(srcStat.gid === dstStat.gid)
                 assert(srcMtime === dstMtime)
-            })
+            }
+
+            return run()
         }
 
         it("lib async version.", done => {
@@ -475,23 +476,21 @@ describe("The copy method", () => {
     })
 
     describe("should not copy specified files if the source file is older than the destination file, when `--update` option was given:", () => {
-        beforeEach(
-            co.wrap(function*() {
-                yield setupTestDir({
-                    "test-ws/a.txt": "newer source",
-                    "test-ws/b.txt": "older source",
-                    "test-ws/a/a.txt": "older destination",
-                    "test-ws/a/b.txt": "newer destination",
-                })
-
-                const older = Date.now() / 1000
-                const newer = older + 1
-                yield fs.utimes("test-ws/a.txt", newer, newer)
-                yield fs.utimes("test-ws/b.txt", older, older)
-                yield fs.utimes("test-ws/a/a.txt", older, older)
-                yield fs.utimes("test-ws/a/b.txt", newer, newer)
+        beforeEach(async () => {
+            await setupTestDir({
+                "test-ws/a.txt": "newer source",
+                "test-ws/b.txt": "older source",
+                "test-ws/a/a.txt": "older destination",
+                "test-ws/a/b.txt": "newer destination",
             })
-        )
+
+            const older = Date.now() / 1000
+            const newer = older + 1
+            await fs.utimes("test-ws/a.txt", newer, newer)
+            await fs.utimes("test-ws/b.txt", older, older)
+            await fs.utimes("test-ws/a/a.txt", older, older)
+            await fs.utimes("test-ws/a/b.txt", newer, newer)
+        })
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -525,23 +524,21 @@ describe("The copy method", () => {
     })
 
     describe("should copy specified files when `--update` option was not given:", () => {
-        beforeEach(
-            co.wrap(function*() {
-                yield setupTestDir({
-                    "test-ws/a.txt": "newer source",
-                    "test-ws/b.txt": "older source",
-                    "test-ws/a/a.txt": "older destination",
-                    "test-ws/a/b.txt": "newer destination",
-                })
-
-                const older = Date.now() / 1000
-                const newer = older + 1
-                yield fs.utimes("test-ws/a.txt", newer, newer)
-                yield fs.utimes("test-ws/b.txt", older, older)
-                yield fs.utimes("test-ws/a/a.txt", older, older)
-                yield fs.utimes("test-ws/a/b.txt", newer, newer)
+        beforeEach(async () => {
+            await setupTestDir({
+                "test-ws/a.txt": "newer source",
+                "test-ws/b.txt": "older source",
+                "test-ws/a/a.txt": "older destination",
+                "test-ws/a/b.txt": "newer destination",
             })
-        )
+
+            const older = Date.now() / 1000
+            const newer = older + 1
+            await fs.utimes("test-ws/a.txt", newer, newer)
+            await fs.utimes("test-ws/b.txt", older, older)
+            await fs.utimes("test-ws/a/a.txt", older, older)
+            await fs.utimes("test-ws/a/b.txt", newer, newer)
+        })
         afterEach(() => teardownTestDir("test-ws"))
 
         /**
@@ -710,12 +707,10 @@ describe("The copy method", () => {
 
     describe("should copy as expected even if a specific path didn't include `/`.", () => {
         beforeEach(() => setupTestDir({ "hello.txt": "Hello" }))
-        afterEach(
-            co.wrap(function*() {
-                yield teardownTestDir("hello.txt")
-                yield teardownTestDir("test-ws")
-            })
-        )
+        afterEach(async () => {
+            await teardownTestDir("hello.txt")
+            await teardownTestDir("test-ws")
+        })
 
         /**
          * Verify.
