@@ -25,7 +25,6 @@
     "watch": "npm run -s _mocha -- --require @babel/register --watch --growl"
   },
   "dependencies": {
-    "co": "^4.6.0",
     "debounce": "^1.2.0",
     "debug": "^4.1.1",
     "duplexer": "^0.1.1",
