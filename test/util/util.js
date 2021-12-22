@@ -12,7 +12,6 @@
 const assert = require("assert")
 const exec = require("child_process").exec
 const dirname = require("path").dirname
-const co = require("co")
 const fs = require("fs-extra")
 const execSync = require("shelljs").exec
 
@@ -37,13 +36,13 @@ const delay = (module.exports.delay = function delay(ms) {
  * @param {string} contentText - A text to write.
  * @returns {Promise<void>} The promise which will go fulfilled after done.
  */
-const writeFile = (module.exports.writeFile = co.wrap(function* writeFile(
+const writeFile = (module.exports.writeFile = async function writeFile(
     path,
     contentText
 ) {
-    yield fs.ensureDir(dirname(path))
-    yield fs.writeFile(path, contentText)
-}))
+    await fs.ensureDir(dirname(path))
+    await fs.writeFile(path, contentText)
+})
 
 /**
  * Removes a specific file.
@@ -97,12 +96,12 @@ module.exports.teardownTestDir = function teardownTestDir(testRootPath) {
  * @param {object} dataset - Test data to write.
  * @returns {Promise<void>} The promise which will go fulfilled after done.
  */
-module.exports.verifyTestDir = co.wrap(function* verifyTestDir(dataset) {
+module.exports.verifyTestDir = async function verifyTestDir(dataset) {
     for (const path of Object.keys(dataset)) {
-        const content = yield readFile(path)
+        const content = await readFile(path)
         assert.strictEqual(content, dataset[path])
     }
-})
+}
 
 /**
  * Execute cpx command.
