@@ -548,6 +548,36 @@ describe("The watch method", () => {
         })
     }
 
+    describe("should copy and watch file from a parent dir:", () => {
+        const pattern = {
+            initialFiles: {
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/example.txt": "intial copy",
+            },
+            action() {
+                return writeFile("../example.txt", "updated file")
+            },
+            verify: {
+                "test-ws/a/hello.txt": "Hello",
+                "test-ws/a/example.txt": "updated file",
+            },
+            wait: waitForCopy,
+        }
+
+        beforeEach(() => setupTestDir(pattern.initialFiles))
+
+        it("lib version", async () => {
+            const startingCwd = process.cwd()
+            process.chdir(path.join(startingCwd, "test-ws/a"))
+            watcher = cpx.watch("../example.txt", ".")
+            await waitForReady()
+            await pattern.action()
+            await pattern.wait()
+            process.chdir(startingCwd)
+            await verifyTestDir(pattern.verify)
+        })
+    })
+
     describe("should do reactions of multiple events:", () => {
         beforeEach(() =>
             setupTestDir({
