@@ -33,7 +33,9 @@ Options:
     -c, --command <command>   A command text to transform each file.
     -C, --clean               Clean files that matches <source> like pattern in
                               <dest> directory before the first copying.
-    -i  --ignore              A comma separated list of gitignore style ignore
+    -f, --force               Force the file to be copied, even if the
+                              destination is readonly.   
+    -i, --ignore              A comma separated list of gitignore style ignore
                               patterns.
     -L, --dereference         Follow symbolic links when copying from them.
     -h, --help                Print usage information.
@@ -109,6 +111,7 @@ cpx.copy(source, dest, callback)
   - **options.dereference** `{boolean}` -- The flag to follow symbolic links when copying from them. Default: `false`.
   - **options.includeEmptyDirs** `{boolean}` -- The flag to copy empty directories which is matched with the glob. Default: `false`.
   - **options.initialCopy** `{boolean}` -- The flag to not copy at the initial time of watch. This is for `cpx.watch()`. Default: `true`.
+  - **options.force** `{boolean}` -- The flag to copy file to the destination, even if it is readonly.
   - **options.preserve** `{boolean}` -- The flag to copy uid, gid, atime, and mtime of files. Default: `false`.
   - **options.transform** `{((filepath: string) => stream.Transform)[]}` -- Functions that creates a `stream.Transform` object to transform each copying file.
   - **options.update** `{boolean}` -- The flag to not overwrite files on destination if the source file is older. Default: `false`.
