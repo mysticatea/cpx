@@ -115,6 +115,7 @@ module.exports = function main(source, outDir, args) {
         dereference: args.dereference,
         includeEmptyDirs: args.includeEmptyDirs,
         initialCopy: args.initial,
+        force: args.force,
         preserve: args.preserve,
         update: args.update,
         ignore: args.ignore && args.ignore.split(","),
