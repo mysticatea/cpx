@@ -22,6 +22,7 @@ const args = subarg(process.argv.slice(2), {
     alias: {
         c: "command",
         C: "clean",
+        f: "force",
         h: "help",
         includeEmptyDirs: "include-empty-dirs",
         i: "ignore",
@@ -37,6 +38,7 @@ const args = subarg(process.argv.slice(2), {
         "clean",
         "dereference",
         "help",
+        "force",
         "include-empty-dirs",
         "initial",
         "preserve",
