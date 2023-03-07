@@ -46,7 +46,7 @@
     "auto-changelog": "^2.2.0",
     "babel-preset-power-assert": "^3.0.0",
     "eslint": "^7.9.0",
-    "gh-release": "^6.0.0",
+    "gh-release": "^7.0.2",
     "mocha": "^9.0.3",
     "nyc": "15.1.0",
     "opener": "^1.5.1",
